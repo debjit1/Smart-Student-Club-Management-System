@@ -7,6 +7,7 @@ events — from club creation and membership, through event proposals, budget
 approvals, volunteer task management, QR attendance, and certificate
 generation.
 
+For Demo Video of the app: https://drive.google.com/drive/folders/18RHpAZIvgAvYBOhnTUYbWzZvhMjoQAV5?usp=sharing
 ---
 
 ## Table of Contents
