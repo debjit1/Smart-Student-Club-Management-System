@@ -1,0 +1,9 @@
+@import url('../shared/css/variables.css');
+@import url('../shared/css/dashboard.css');
+@import url('../shared/css/inventory.css');
+@import url('../shared/css/venues.css');
+@import url('../shared/css/finances.css');
+@import url('css/finances.css');
+@import url('../shared/css/budgets.css');
+@import url('../shared/css/proposals.css');
+@import url('../shared/css/calendar.css');

@@ -1,0 +1,32 @@
+/* Club Head's Finances & Budgets tab is a merged view of both concerns, so it
+   layers a few extra rules on top of the shared base (shared/css/finances.css,
+   imported first in styles.css) — including its own `.club-finance-cards-grid`
+   (auto-fill) which intentionally overrides the shared one (auto-fit) by
+   simple CSS source order. */
+/* ────────────────────────────────────────────────────────────
+   CLUB FINANCES & EVENT BUDGETS (MERGED TAB)
+───────────────────────────────────────────────────────────── */
+.club-finance-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.club-finance-card {
+    cursor: pointer;
+}
+
+.section-subtitle {
+    font-size: 1.05rem;
+}
+
+#event-split-placeholder .card-body,
+#event-split-placeholder {
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .club-finance-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}

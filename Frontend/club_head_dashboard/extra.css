@@ -1,0 +1,491 @@
+/* ============================================================
+   Club Head Dashboard — additional styles
+   (Extends variables.css / styles.css / proposals.css so the
+   look & feel exactly matches the President portal)
+============================================================ */
+
+/* ---- View actions bar (title + New Proposal button) ---- */
+.view-actions-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.filters-row {
+    display: flex;
+    align-items: center;
+}
+
+/* ---- Empty state re-used inside dynamic tables ---- */
+.ch-empty-row td {
+    text-align: center;
+    padding: 1.5rem 1rem !important;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.ch-empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    grid-column: span 3;
+}
+
+.ch-empty-state i {
+    font-size: 2.5rem;
+    opacity: 0.5;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* ---- Add row button under each table ---- */
+.ch-add-row-btn {
+    margin-top: 0.25rem;
+    margin-bottom: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary-light);
+    color: var(--primary);
+    border: 1px dashed rgba(2, 132, 199, 0.35);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-md);
+    font-size: 0.825rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.ch-add-row-btn:hover {
+    background: rgba(2, 132, 199, 0.14);
+    border-color: var(--primary);
+}
+
+/* ---- Event Management: toggle switcher (Approved Details / Task Allotment / Registrations / Edit & Publish) ---- */
+.ch-em-toggle-btn.active {
+    background: var(--grad-primary);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+}
+
+.ch-em-toggle-pane.hidden {
+    display: none;
+}
+
+/* ---- Searchable "Requirement" combobox ---- */
+.ch-searchable {
+    position: relative;
+    min-width: 200px;
+}
+
+.ch-searchable .ch-req-search {
+    height: 34px;
+    font-size: 0.825rem;
+}
+
+.ch-searchable .ch-req-search:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.ch-dropdown-list {
+    /* Positioned with fixed + inline top/left/width set by JS (see openReqDropdown),
+       so it always renders in front and is never clipped by the table's
+       overflow-x:auto scroll container. */
+    position: fixed;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-lg);
+    max-height: 260px;
+    overflow-y: auto;
+    z-index: 9999;
+}
+
+.ch-dropdown-list.hidden {
+    display: none;
+}
+
+.ch-dropdown-option {
+    padding: 0.55rem 0.75rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.ch-dropdown-option:last-child { border-bottom: none; }
+
+.ch-dropdown-option:hover,
+.ch-dropdown-option.active-hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+.ch-dropdown-option .ch-opt-stock {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: 10px;
+    background-color: var(--success-light);
+    color: var(--success);
+    white-space: nowrap;
+}
+
+.ch-dropdown-option .ch-opt-stock.low {
+    background-color: var(--warning-light);
+    color: var(--warning);
+}
+
+.ch-dropdown-option .ch-opt-stock.none {
+    background-color: var(--danger-light);
+    color: var(--danger);
+}
+
+.ch-dropdown-empty {
+    padding: 0.75rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.ch-stock-hint {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* ---- Table row remove button alignment ---- */
+.ch-remove-row {
+    margin: 0 auto;
+}
+
+/* ---- Form section card wrapper ---- */
+.ch-form-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1.75rem;
+}
+
+/* ---- Reference feedback box shown while revising ---- */
+.ch-feedback-ref {
+    background-color: var(--warning-light);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-left: 4px solid var(--warning);
+    border-radius: var(--border-radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text-main);
+}
+
+.ch-feedback-ref strong {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--warning);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ---- Read-only comment / feedback boxes in detail view ---- */
+.ch-readonly-box {
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 0.85rem 1.1rem;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    line-height: 1.5;
+    min-height: 44px;
+}
+
+.ch-readonly-box.empty {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.ch-two-col-boxes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-top: 1rem;
+}
+
+.ch-box-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+/* ---- Comment chip shown inline in read-only detail rows ---- */
+.ch-item-comment {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 0.2rem;
+}
+
+@media (max-width: 900px) {
+    .ch-two-col-boxes { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   MANAGE MEMBERS / VOLUNTEER MANAGEMENT — Domain cards
+============================================================ */
+.domain-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.domain-card {
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 1.25rem;
+    background-color: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.domain-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.domain-card-header h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.domain-card-subtitle {
+    font-size: 0.78rem;
+    color: var(--primary);
+    font-weight: 600;
+    margin-top: 0.15rem;
+}
+
+.domain-role-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 0;
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-main);
+}
+
+.domain-role-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.4;
+}
+
+.domain-role-list li i {
+    color: var(--primary);
+    font-size: 0.7rem;
+    margin-top: 0.3rem;
+    flex-shrink: 0;
+}
+
+.domain-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.85rem;
+    margin-top: 0.15rem;
+    flex-wrap: wrap;
+}
+
+.domain-volunteer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0;
+    margin: 0;
+}
+
+.domain-volunteer-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 0.6rem 0.85rem;
+    font-size: 0.82rem;
+}
+
+/* ---- Live attendance stats strip (QR scanner modal) ---- */
+.ch-qr-stat {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-sm);
+    padding: 0.5rem 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 96px;
+}
+
+.ch-qr-stat-lbl {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.ch-qr-stat-val {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* ============================================================
+   AI PROPOSAL ASSISTANT — status panel under the Generate button
+============================================================ */
+.ch-ai-loading,
+.ch-ai-error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--border-radius-md);
+    font-size: 0.85rem;
+}
+
+.ch-ai-loading {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+.ch-ai-error {
+    background-color: var(--danger-light);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    align-items: flex-start;
+}
+
+.ch-ai-result {
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary);
+    border-radius: var(--border-radius-md);
+    padding: 1rem 1.15rem;
+    font-size: 0.82rem;
+    color: var(--text-main);
+}
+
+.ch-ai-result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+}
+
+.ch-ai-metrics {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+}
+
+.ch-ai-metric {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 0.45rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.ch-ai-metric-lbl {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.ch-ai-metric-val {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.ch-ai-desc {
+    margin: 0 0 0.6rem;
+    line-height: 1.5;
+}
+
+.ch-ai-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    background-color: var(--warning-light);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: var(--border-radius-sm);
+    padding: 0.55rem 0.75rem;
+    font-size: 0.78rem;
+    color: var(--text-main);
+    margin: 0 0 0.6rem;
+}
+
+.ch-ai-details {
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.45rem;
+    margin-top: 0.45rem;
+}
+
+.ch-ai-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 0.8rem;
+}
+
+.ch-ai-details ul {
+    margin: 0.45rem 0 0;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    line-height: 1.4;
+}
+
+.ch-ai-risk {
+    margin: 0.45rem 0 0;
+    line-height: 1.5;
+}

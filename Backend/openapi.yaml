@@ -1,0 +1,6608 @@
+openapi: 3.0.3
+info:
+  title: SSCMS API
+  description: 'Smart Student Club Management System -- Backend Sprint 1 (Milestone
+    3) covered Epics 1-3: Role-Based Portal Access & Onboarding, Venue Booking & Asset
+    Management, and Event Lifecycle & Approval Workflows. Backend Sprint 2 (Milestone
+    4) adds Epics 4-6: Task Management & Volunteer Workflows, QR Attendance & Live
+    Execution, and Certification & Budget Analytics.'
+  version: 1.1.0
+paths:
+  /auth/register:
+    post:
+      tags:
+      - Authentication
+      summary: Register
+      operationId: register_auth_register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOut'
+        '409':
+          description: student_id or email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/login:
+    post:
+      tags:
+      - Authentication
+      summary: Login
+      operationId: login_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenOut'
+        '401':
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/me:
+    get:
+      tags:
+      - Authentication
+      summary: Read Current User
+      operationId: read_current_user_auth_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOut'
+      security:
+      - OAuth2PasswordBearer: []
+  /auth/change-password:
+    post:
+      tags:
+      - Authentication
+      summary: Change Password
+      operationId: change_password_auth_change_password_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Current password is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /auth/bulk-import:
+    post:
+      tags:
+      - Authentication
+      summary: Bulk Import Users Auth Alias
+      operationId: bulk_import_users_auth_alias_auth_bulk_import_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_bulk_import_users_auth_alias_auth_bulk_import_post'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkUserImportOut'
+        '403':
+          description: Faculty Coordinator role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /me/memberships:
+    get:
+      tags:
+      - Clubs & Membership
+      summary: List My Memberships
+      operationId: list_my_memberships_me_memberships_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ClubMemberOut'
+                type: array
+                title: Response List My Memberships Me Memberships Get
+      security:
+      - OAuth2PasswordBearer: []
+  /me/volunteer-applications:
+    get:
+      tags:
+      - Clubs & Membership
+      summary: List My Volunteer Applications
+      operationId: list_my_volunteer_applications_me_volunteer_applications_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/VolunteerApplicationOut'
+                type: array
+                title: Response List My Volunteer Applications Me Volunteer Applications
+                  Get
+      security:
+      - OAuth2PasswordBearer: []
+  /clubs:
+    get:
+      tags:
+      - Clubs & Membership
+      summary: List Clubs
+      operationId: list_clubs_clubs_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ClubOut'
+                type: array
+                title: Response List Clubs Clubs Get
+    post:
+      tags:
+      - Clubs & Membership
+      summary: Create Club
+      operationId: create_club_clubs_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClubCreate'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubCreateResponse'
+        '409':
+          description: Club name or club head email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /clubs/{club_id}:
+    get:
+      tags:
+      - Clubs & Membership
+      summary: Get Club
+      operationId: get_club_clubs__club_id__get
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubOut'
+        '404':
+          description: Club not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Clubs & Membership
+      summary: Update Club
+      operationId: update_club_clubs__club_id__patch
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClubUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubOut'
+        '403':
+          description: Caller cannot manage this club
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Club not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Clubs & Membership
+      summary: Delete Club
+      operationId: delete_club_clubs__club_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      responses:
+        '204':
+          description: Successful Response
+        '403':
+          description: Caller cannot manage this club
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Club not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clubs/{club_id}/club-head/reset-password:
+    post:
+      tags:
+      - Clubs & Membership
+      summary: Reset Club Head Password
+      operationId: reset_club_head_password_clubs__club_id__club_head_reset_password_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClubHeadPasswordReset'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubHeadPasswordResetOut'
+        '403':
+          description: Caller cannot manage this club
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Club or Club Head not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clubs/{club_id}/review:
+    post:
+      tags:
+      - Clubs & Membership
+      summary: Review Club
+      operationId: review_club_clubs__club_id__review_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClubReview'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubOut'
+        '404':
+          description: Club not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Club is not in Pending status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clubs/{club_id}/members/apply:
+    post:
+      tags:
+      - Clubs & Membership
+      summary: Apply For Membership
+      operationId: apply_for_membership_clubs__club_id__members_apply_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubMemberOut'
+        '404':
+          description: Club not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Already a member or already applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clubs/{club_id}/members:
+    get:
+      tags:
+      - Clubs & Membership
+      summary: List Club Members
+      operationId: list_club_members_clubs__club_id__members_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      - name: status_filter
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status Filter
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClubMemberOut'
+                title: Response List Club Members Clubs  Club Id  Members Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clubs/{club_id}/members/{member_id}/review:
+    post:
+      tags:
+      - Clubs & Membership
+      summary: Review Membership
+      operationId: review_membership_clubs__club_id__members__member_id__review_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      - name: member_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Member Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationReview'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubMemberOut'
+        '403':
+          description: Caller is not this club's Club Head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Membership request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Membership request already decided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clubs/{club_id}/domains:
+    post:
+      tags:
+      - Clubs & Membership
+      summary: Create Domain
+      operationId: create_domain_clubs__club_id__domains_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainOut'
+        '403':
+          description: Caller is not this club's Club Head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - Clubs & Membership
+      summary: List Domains
+      operationId: list_domains_clubs__club_id__domains_get
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DomainOut'
+                title: Response List Domains Clubs  Club Id  Domains Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /domains/{domain_id}/recruitment:
+    patch:
+      tags:
+      - Clubs & Membership
+      summary: Toggle Recruitment
+      operationId: toggle_recruitment_domains__domain_id__recruitment_patch
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: domain_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Domain Id
+      - name: recruitment_open
+        in: query
+        required: true
+        schema:
+          type: boolean
+          title: Recruitment Open
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainOut'
+        '404':
+          description: Domain not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /domains/{domain_id}:
+    delete:
+      tags:
+      - Clubs & Membership
+      summary: Delete Domain
+      operationId: delete_domain_domains__domain_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: domain_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Domain Id
+      responses:
+        '204':
+          description: Successful Response
+        '403':
+          description: Caller is not this club's Club Head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Domain not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Domain has Pending or Selected volunteer applications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clubs/{club_id}/volunteer-applications:
+    post:
+      tags:
+      - Clubs & Membership
+      summary: Apply As Volunteer
+      operationId: apply_as_volunteer_clubs__club_id__volunteer_applications_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VolunteerApplicationCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolunteerApplicationOut'
+        '404':
+          description: Domain not found or recruitment closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Already applied to this domain
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - Clubs & Membership
+      summary: List Volunteer Applications
+      operationId: list_volunteer_applications_clubs__club_id__volunteer_applications_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      - name: status_filter
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status Filter
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VolunteerApplicationOut'
+                title: Response List Volunteer Applications Clubs  Club Id  Volunteer
+                  Applications Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clubs/{club_id}/volunteer-applications/{application_id}/review:
+    post:
+      tags:
+      - Clubs & Membership
+      summary: Review Volunteer Application
+      operationId: review_volunteer_application_clubs__club_id__volunteer_applications__application_id__review_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Application Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationReview'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolunteerApplicationOut'
+        '403':
+          description: Caller is not this club's Club Head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Application already decided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clubs/{club_id}/volunteer-applications/{application_id}/revoke:
+    post:
+      tags:
+      - Clubs & Membership
+      summary: Revoke Volunteer Application
+      operationId: revoke_volunteer_application_clubs__club_id__volunteer_applications__application_id__revoke_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Application Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolunteerApplicationOut'
+        '403':
+          description: Caller is not this club's Club Head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Application is not currently Selected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clubs/{club_id}/volunteer-applications/{application_id}/reopen:
+    post:
+      tags:
+      - Clubs & Membership
+      summary: Reopen Volunteer Application
+      operationId: reopen_volunteer_application_clubs__club_id__volunteer_applications__application_id__reopen_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Application Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolunteerApplicationOut'
+        '403':
+          description: Caller is not this club's Club Head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Application is not Rejected or Revoked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /venues:
+    get:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: List Venues
+      operationId: list_venues_venues_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/VenueOut'
+                type: array
+                title: Response List Venues Venues Get
+    post:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Create Venue
+      operationId: create_venue_venues_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VenueCreate'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VenueOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /venues/{venue_id}:
+    patch:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Update Venue
+      operationId: update_venue_venues__venue_id__patch
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: venue_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Venue Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VenueUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VenueOut'
+        '403':
+          description: Faculty Coordinator role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Venue not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Delete Venue
+      operationId: delete_venue_venues__venue_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: venue_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Venue Id
+      responses:
+        '204':
+          description: Successful Response
+        '403':
+          description: Faculty Coordinator role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Venue not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Venue is referenced by a booking or an event proposal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /venues/{venue_id}/availability:
+    get:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Check Venue Availability
+      description: 'Story 2.1: reports whether `venue_id` is free on `booking_date`
+
+        (YYYY-MM-DD) by looking for an existing non-Released booking.'
+      operationId: check_venue_availability_venues__venue_id__availability_get
+      parameters:
+      - name: venue_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Venue Id
+      - name: booking_date
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Booking Date
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Venue not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /bookings:
+    post:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Create Booking
+      operationId: create_booking_bookings_post
+      security:
+      - OAuth2PasswordBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingOut'
+        '404':
+          description: Venue or event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Venue already booked for this date
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: List Bookings
+      operationId: list_bookings_bookings_get
+      parameters:
+      - name: venue_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Venue Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookingOut'
+                title: Response List Bookings Bookings Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /bookings/{booking_id}:
+    patch:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Update Booking Status
+      operationId: update_booking_status_bookings__booking_id__patch
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: booking_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Booking Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingStatusUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /bookings/{booking_id}/release:
+    post:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Release Booking
+      operationId: release_booking_bookings__booking_id__release_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: booking_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Booking Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingOut'
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /inventory:
+    get:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: List Inventory
+      operationId: list_inventory_inventory_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/InventoryItemOut'
+                type: array
+                title: Response List Inventory Inventory Get
+    post:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Create Inventory Item
+      operationId: create_inventory_item_inventory_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItemCreate'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItemOut'
+        '409':
+          description: Item code already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /inventory/{item_id}:
+    patch:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Update Inventory Item
+      operationId: update_inventory_item_inventory__item_id__patch
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: item_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Item Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItemUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItemOut'
+        '403':
+          description: Faculty Coordinator role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Inventory item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Delete Inventory Item
+      operationId: delete_inventory_item_inventory__item_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: item_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Item Id
+      responses:
+        '204':
+          description: Successful Response
+        '403':
+          description: Faculty Coordinator role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Inventory item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Item is referenced by inventory usage
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /inventory/{item_id}/checkout:
+    post:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Checkout Inventory
+      operationId: checkout_inventory_inventory__item_id__checkout_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: item_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Item Id
+      - name: event_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Event Id
+      - name: quantity
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Quantity
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItemOut'
+        '404':
+          description: Item or event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Not enough available stock
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /inventory/usage:
+    get:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: List Inventory Usage
+      operationId: list_inventory_usage_inventory_usage_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/InventoryUsageOut'
+                type: array
+                title: Response List Inventory Usage Inventory Usage Get
+    post:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Create Inventory Usage
+      operationId: create_inventory_usage_inventory_usage_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryUsageCreate'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryUsageOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /inventory/usage/{usage_id}/mark-in-use:
+    post:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Mark Inventory Usage In Use
+      operationId: mark_inventory_usage_in_use_inventory_usage__usage_id__mark_in_use_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: usage_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Usage Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryUsageOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /inventory/usage/{usage_id}/return:
+    post:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Return Inventory Usage
+      operationId: return_inventory_usage_inventory_usage__usage_id__return_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: usage_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Usage Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryUsageOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /venues/bulk-import:
+    post:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Create Venues Bulk
+      operationId: create_venues_bulk_venues_bulk_import_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_create_venues_bulk_venues_bulk_import_post'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkVenueOut'
+        '403':
+          description: Faculty Coordinator role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /venues/bulk:
+    post:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Create Venues Bulk
+      operationId: create_venues_bulk_venues_bulk_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_create_venues_bulk_venues_bulk_post'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkVenueOut'
+        '403':
+          description: Faculty Coordinator role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /inventory/bulk-import:
+    post:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Create Inventory Bulk
+      operationId: create_inventory_bulk_inventory_bulk_import_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_create_inventory_bulk_inventory_bulk_import_post'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkInventoryOut'
+        '403':
+          description: Faculty Coordinator role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /inventory/bulk:
+    post:
+      tags:
+      - Venues, Inventory & Bookings
+      summary: Create Inventory Bulk
+      operationId: create_inventory_bulk_inventory_bulk_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_create_inventory_bulk_inventory_bulk_post'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkInventoryOut'
+        '403':
+          description: Faculty Coordinator role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /proposals:
+    post:
+      tags:
+      - Event Proposals & Events
+      summary: Create Proposal
+      operationId: create_proposal_proposals_post
+      security:
+      - OAuth2PasswordBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventProposalCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposalOut'
+        '403':
+          description: Caller is not this club's Club Head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Club or venue not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - Event Proposals & Events
+      summary: List Proposals
+      operationId: list_proposals_proposals_get
+      parameters:
+      - name: club_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Club Id
+      - name: status_filter
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status Filter
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventProposalOut'
+                title: Response List Proposals Proposals Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /proposals/{proposal_id}:
+    get:
+      tags:
+      - Event Proposals & Events
+      summary: Get Proposal
+      operationId: get_proposal_proposals__proposal_id__get
+      parameters:
+      - name: proposal_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Proposal Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposalOut'
+        '404':
+          description: Proposal not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Event Proposals & Events
+      summary: Update Proposal
+      operationId: update_proposal_proposals__proposal_id__patch
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: proposal_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Proposal Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventProposalUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposalOut'
+        '403':
+          description: Caller is not this club's Club Head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Proposal not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Proposal is not in Draft or Needs Revision status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /proposals/{proposal_id}/submit:
+    post:
+      tags:
+      - Event Proposals & Events
+      summary: Submit Proposal
+      operationId: submit_proposal_proposals__proposal_id__submit_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: proposal_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Proposal Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposalOut'
+        '403':
+          description: Caller is not this club's Club Head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Proposal not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Proposal is not in Draft status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /proposals/{proposal_id}/president-review:
+    post:
+      tags:
+      - Event Proposals & Events
+      summary: President Review
+      operationId: president_review_proposals__proposal_id__president_review_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: proposal_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Proposal Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalReview'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposalOut'
+        '403':
+          description: Caller is not this club's Club President
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Proposal not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Proposal is not Pending President Review
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /proposals/{proposal_id}/send-for-revision:
+    post:
+      tags:
+      - Event Proposals & Events
+      summary: Send Proposal For Revision
+      operationId: send_proposal_for_revision_proposals__proposal_id__send_for_revision_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: proposal_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Proposal Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalRevisionRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposalOut'
+        '403':
+          description: Caller is not this club's President (Pending President Review)
+            / Faculty Coordinator (Pending Faculty Approval)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Proposal not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Proposal is not Pending President Review or Pending Faculty
+            Approval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /proposals/{proposal_id}/faculty-review:
+    post:
+      tags:
+      - Event Proposals & Events
+      summary: Faculty Review
+      operationId: faculty_review_proposals__proposal_id__faculty_review_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: proposal_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Proposal Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalReview'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposalOut'
+        '404':
+          description: Proposal not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Proposal is not Pending Faculty Approval, or its venue is already
+            booked (Story 2.1)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /events:
+    get:
+      tags:
+      - Event Proposals & Events
+      summary: List Events
+      operationId: list_events_events_get
+      parameters:
+      - name: club_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Club Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventOut'
+                title: Response List Events Events Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /events/{event_id}:
+    get:
+      tags:
+      - Event Proposals & Events
+      summary: Get Event
+      operationId: get_event_events__event_id__get
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventOut'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /events/{event_id}/publish:
+    post:
+      tags:
+      - Event Proposals & Events
+      summary: Publish Event
+      operationId: publish_event_events__event_id__publish_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventOut'
+        '403':
+          description: Caller is not this club's Club Head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clubs/{club_id}/chat:
+    get:
+      tags:
+      - Club Chat
+      summary: List Chat Messages
+      operationId: list_chat_messages_clubs__club_id__chat_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      - name: student_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Student Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChatMessageOut'
+                title: Response List Chat Messages Clubs  Club Id  Chat Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Club Chat
+      summary: Send Chat Message
+      operationId: send_chat_message_clubs__club_id__chat_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessageCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessageOut'
+        '404':
+          description: Club not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /notifications:
+    get:
+      tags:
+      - Notifications
+      summary: List My Notifications
+      operationId: list_my_notifications_notifications_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/NotificationOut'
+                type: array
+                title: Response List My Notifications Notifications Get
+      security:
+      - OAuth2PasswordBearer: []
+    post:
+      tags:
+      - Notifications
+      summary: Create Notification
+      operationId: create_notification_notifications_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationCreate'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /notifications/read-all:
+    post:
+      tags:
+      - Notifications
+      summary: Read All Notifications
+      operationId: read_all_notifications_notifications_read_all_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /clubs/{club_id}/finance:
+    get:
+      tags:
+      - Club Finance
+      summary: Get Club Finance
+      operationId: get_club_finance_clubs__club_id__finance_get
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubFinanceOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clubs/{club_id}/finance/transactions:
+    get:
+      tags:
+      - Club Finance
+      summary: List Finance Transactions
+      operationId: list_finance_transactions_clubs__club_id__finance_transactions_get
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FinanceTransactionOut'
+                title: Response List Finance Transactions Clubs  Club Id  Finance
+                  Transactions Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Club Finance
+      summary: Create Finance Transaction
+      operationId: create_finance_transaction_clubs__club_id__finance_transactions_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinanceTransactionCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinanceTransactionOut'
+        '409':
+          description: Adjustment exceeds current allotted budget
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /finance/transactions:
+    post:
+      tags:
+      - Club Finance
+      summary: Create Global Finance Transaction
+      operationId: create_global_finance_transaction_finance_transactions_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlobalFinanceTransactionCreate'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinanceTransactionOut'
+        '409':
+          description: Adjustment exceeds current allotted budget
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /faculty-budget-pool:
+    get:
+      tags:
+      - Club Finance
+      summary: Get Faculty Budget Pool
+      operationId: get_faculty_budget_pool_faculty_budget_pool_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacultyBudgetPoolOut'
+    patch:
+      tags:
+      - Club Finance
+      summary: Update Faculty Budget Pool
+      operationId: update_faculty_budget_pool_faculty_budget_pool_patch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacultyBudgetPoolUpdate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacultyBudgetPoolOut'
+        '409':
+          description: Total is below what's already allotted to clubs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /clubs/{club_id}/event-budgets:
+    post:
+      tags:
+      - Club Finance
+      summary: Create Event Budget
+      operationId: create_event_budget_clubs__club_id__event_budgets_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventBudgetCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventBudgetOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - Club Finance
+      summary: List Event Budgets
+      operationId: list_event_budgets_clubs__club_id__event_budgets_get
+      parameters:
+      - name: club_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Club Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventBudgetOut'
+                title: Response List Event Budgets Clubs  Club Id  Event Budgets Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /event-budgets/{event_budget_id}:
+    get:
+      tags:
+      - Club Finance
+      summary: Get Event Budget
+      operationId: get_event_budget_event_budgets__event_budget_id__get
+      parameters:
+      - name: event_budget_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Budget Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventBudgetOut'
+        '404':
+          description: Event budget not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Club Finance
+      summary: Delete Event Budget
+      operationId: delete_event_budget_event_budgets__event_budget_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: event_budget_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Budget Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /event-budgets/{event_budget_id}/comment:
+    patch:
+      tags:
+      - Club Finance
+      summary: Update Event Budget Comment
+      operationId: update_event_budget_comment_event_budgets__event_budget_id__comment_patch
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: event_budget_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Budget Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventBudgetCommentUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventBudgetOut'
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+          description: Forbidden
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /event-budgets/{event_budget_id}/close:
+    post:
+      tags:
+      - Club Finance
+      summary: Close Event Budget
+      operationId: close_event_budget_event_budgets__event_budget_id__close_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: event_budget_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Budget Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventBudgetOut'
+        '404':
+          description: Event budget not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Already closed, or has expenses still awaiting review
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /event-budgets/{event_budget_id}/expenses:
+    post:
+      tags:
+      - Club Finance
+      summary: Create Expense
+      operationId: create_expense_event_budgets__event_budget_id__expenses_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: event_budget_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Budget Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - Club Finance
+      summary: List Expenses
+      operationId: list_expenses_event_budgets__event_budget_id__expenses_get
+      parameters:
+      - name: event_budget_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Budget Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExpenseOut'
+                title: Response List Expenses Event Budgets  Event Budget Id  Expenses
+                  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /expenses/{expense_id}/upload-bill:
+    post:
+      tags:
+      - Club Finance
+      summary: Upload Bill
+      operationId: upload_bill_expenses__expense_id__upload_bill_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: expense_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Expense Id
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_upload_bill_expenses__expense_id__upload_bill_post'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseOut'
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+          description: Forbidden
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /expenses/{expense_id}/prize-details:
+    post:
+      tags:
+      - Club Finance
+      summary: Submit Prize Details
+      operationId: submit_prize_details_expenses__expense_id__prize_details_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: expense_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Expense Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpensePrizeDetails'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseOut'
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+          description: Forbidden
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /expenses/{expense_id}/judge-details:
+    post:
+      tags:
+      - Club Finance
+      summary: Submit Judge Details
+      operationId: submit_judge_details_expenses__expense_id__judge_details_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: expense_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Expense Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseJudgeDetails'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseOut'
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+          description: Forbidden
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /event-budgets/{event_budget_id}/send-for-processing:
+    post:
+      tags:
+      - Club Finance
+      summary: Send For Processing
+      operationId: send_for_processing_event_budgets__event_budget_id__send_for_processing_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: event_budget_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Budget Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExpenseOut'
+                title: Response Send For Processing Event Budgets  Event Budget Id  Send
+                  For Processing Post
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+          description: Forbidden
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /expenses/{expense_id}/president-review:
+    post:
+      tags:
+      - Club Finance
+      summary: President Review Expense
+      operationId: president_review_expense_expenses__expense_id__president_review_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: expense_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Expense Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseReview'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseOut'
+        '409':
+          description: Expense is not Pending President Review
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /expenses/{expense_id}/faculty-review:
+    post:
+      tags:
+      - Club Finance
+      summary: Faculty Review Expense
+      operationId: faculty_review_expense_expenses__expense_id__faculty_review_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: expense_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Expense Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseReview'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseOut'
+        '409':
+          description: Expense is not Pending Faculty Review
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /expenses/{expense_id}/reset:
+    post:
+      tags:
+      - Club Finance
+      summary: Reset Expense
+      operationId: reset_expense_expenses__expense_id__reset_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: expense_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Expense Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseOut'
+        '409':
+          description: Expense is not Approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /events/{event_id}/tasks:
+    post:
+      tags:
+      - Task Management
+      summary: Create Task
+      operationId: create_task_events__event_id__tasks_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskOut'
+        '403':
+          description: Caller is not this club's Club Head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Event not found, or assignee is not a Volunteer of this club
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - Task Management
+      summary: List Event Tasks
+      operationId: list_event_tasks_events__event_id__tasks_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Id
+      - name: status_filter
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status Filter
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskOut'
+                title: Response List Event Tasks Events  Event Id  Tasks Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tasks/mine:
+    get:
+      tags:
+      - Task Management
+      summary: List My Tasks
+      operationId: list_my_tasks_tasks_mine_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: status_filter
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status Filter
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskOut'
+                title: Response List My Tasks Tasks Mine Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tasks/{task_id}/accept:
+    post:
+      tags:
+      - Task Management
+      summary: Accept Task
+      operationId: accept_task_tasks__task_id__accept_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Task Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskOut'
+        '403':
+          description: Caller is not this task's assignee
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Task is not Assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tasks/{task_id}/submit-proof:
+    post:
+      tags:
+      - Task Management
+      summary: Submit Proof
+      operationId: submit_proof_tasks__task_id__submit_proof_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Task Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskProofSubmit'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskOut'
+        '403':
+          description: Caller is not this task's assignee
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Task is not Accepted or Revision Requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tasks/{task_id}/review:
+    post:
+      tags:
+      - Task Management
+      summary: Review Task
+      operationId: review_task_tasks__task_id__review_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Task Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskReview'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskOut'
+        '403':
+          description: Caller is not this club's Club Head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Task is not Submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /events/{event_id}/registrations:
+    post:
+      tags:
+      - QR Attendance
+      summary: Register For Event
+      operationId: register_for_event_events__event_id__registrations_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Id
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationOut'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Already registered for this event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - QR Attendance
+      summary: List Event Registrations
+      operationId: list_event_registrations_events__event_id__registrations_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RegistrationOut'
+                title: Response List Event Registrations Events  Event Id  Registrations
+                  Get
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /registrations/mine:
+    get:
+      tags:
+      - QR Attendance
+      summary: List My Registrations
+      operationId: list_my_registrations_registrations_mine_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RegistrationOut'
+                type: array
+                title: Response List My Registrations Registrations Mine Get
+      security:
+      - OAuth2PasswordBearer: []
+  /registrations/{qr_token}/check-in:
+    post:
+      tags:
+      - QR Attendance
+      summary: Check In
+      operationId: check_in_registrations__qr_token__check_in_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: qr_token
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Qr Token
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationOut'
+        '403':
+          description: Caller cannot check attendees in for this event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '404':
+          description: Registration not found for this token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Already checked in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /events/{event_id}/attendance-stats:
+    get:
+      tags:
+      - QR Attendance
+      summary: Get Attendance Stats
+      description: 'Return real-time attendance statistics for an event.
+
+
+        Accessible to the event''s Club Head, Club President, or Faculty
+
+        Coordinator -- the same roles that can view the full roster.'
+      operationId: get_attendance_stats_events__event_id__attendance_stats_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceStatsOut'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /events/{event_id}/finalize:
+    post:
+      tags:
+      - Certification & Budget Analytics
+      summary: Finalize Event
+      operationId: finalize_event_events__event_id__finalize_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalizeEventOut'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: Event is already finalized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /certificates:
+    get:
+      tags:
+      - Certification & Budget Analytics
+      summary: List My Certificates
+      operationId: list_my_certificates_certificates_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/CertificateOut'
+                type: array
+                title: Response List My Certificates Certificates Get
+      security:
+      - OAuth2PasswordBearer: []
+  /analytics/budget-overview:
+    get:
+      tags:
+      - Certification & Budget Analytics
+      summary: Budget Overview
+      operationId: budget_overview_analytics_budget_overview_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetOverviewOut'
+      security:
+      - OAuth2PasswordBearer: []
+  /students:
+    get:
+      tags:
+      - Student Management
+      summary: List Students
+      operationId: list_students_students_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/StudentDetailOut'
+                type: array
+                title: Response List Students Students Get
+        '403':
+          description: Faculty Coordinator, Club President, or Club Head role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+      security:
+      - OAuth2PasswordBearer: []
+    post:
+      tags:
+      - Student Management
+      summary: Create Student Manual
+      operationId: create_student_manual_students_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentCreateManual'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentDetailOut'
+        '403':
+          description: Faculty Coordinator role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /users/bulk-import:
+    post:
+      tags:
+      - Student Management
+      summary: Bulk Import Users
+      operationId: bulk_import_users_users_bulk_import_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_bulk_import_users_users_bulk_import_post'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkUserImportOut'
+        '403':
+          description: Faculty Coordinator role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /llm/notification-digest:
+    post:
+      tags:
+      - LLM-Assisted Features
+      summary: Notification Digest
+      description: 'Cross-cutting platform feature backing every role''s notification
+        feed: summarizes a caller''s unread notifications (approvals, rejections,
+        deadlines) into a short digest plus up to 3 highlight bullets. Calls Gemini
+        (GEMINI_API_KEY) when configured; otherwise falls back to a deterministic
+        count-based summary -- `source` in the response tells the caller which path
+        was used.'
+      operationId: notification_digest_llm_notification_digest_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationDigestRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationDigestResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /llm/event-proposal-assist:
+    post:
+      tags:
+      - LLM-Assisted Features
+      summary: Event Proposal Assistant
+      description: 'Supports Story 3.1 (Event Proposal Pipeline): when a Club Head
+        is creating a new event proposal, this endpoint takes a minimal input (event
+        name, objective, expected participants) and returns a fully drafted proposal
+        including: event description, agenda, budget estimate, required inventory,
+        volunteer requirements, risk assessment, and a planning timeline. Uses Gemini
+        when GEMINI_API_KEY is set; otherwise falls back to a deterministic heuristic.
+        The response''s `source` field indicates which path was used.'
+      operationId: event_proposal_assist_llm_event_proposal_assist_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventProposalAssistRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposalAssistResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /reports:
+    post:
+      tags:
+      - Report Generation
+      summary: Generate Report
+      description: 'Generate and persist an analytics report.  The Faculty Coordinator
+
+        can request a specific report type with an optional date range filter.'
+      operationId: generate_report_reports_post
+      security:
+      - OAuth2PasswordBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportOut'
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+          description: Unprocessable Entity
+    get:
+      tags:
+      - Report Generation
+      summary: List Reports
+      description: List all previously generated reports, optionally filtered by type.
+      operationId: list_reports_reports_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: report_type
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Report Type
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReportOut'
+                title: Response List Reports Reports Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /reports/{report_id}:
+    get:
+      tags:
+      - Report Generation
+      summary: Get Report
+      description: Retrieve a single report by ID.
+      operationId: get_report_reports__report_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: report_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Report Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportOut'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+          description: Not Found
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /reports/{report_id}/download:
+    get:
+      tags:
+      - Report Generation
+      summary: Download Report
+      description: Download a report as a CSV file.
+      operationId: download_report_reports__report_id__download_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: report_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Report Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOut'
+          description: Not Found
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /health:
+    get:
+      tags:
+      - Health
+      summary: Health Check
+      operationId: health_check_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    AgendaItem:
+      properties:
+        time_slot:
+          type: string
+          title: Time Slot
+          description: e.g. '10:00 - 10:30'
+        activity:
+          type: string
+          title: Activity
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      type: object
+      required:
+      - time_slot
+      - activity
+      title: AgendaItem
+    ApplicationReview:
+      properties:
+        approve:
+          type: boolean
+          title: Approve
+      type: object
+      required:
+      - approve
+      title: ApplicationReview
+    AttendanceStatsOut:
+      properties:
+        event_id:
+          type: integer
+          title: Event Id
+        total_registered:
+          type: integer
+          title: Total Registered
+        checked_in:
+          type: integer
+          title: Checked In
+        pending:
+          type: integer
+          title: Pending
+        last_check_in_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Check In At
+      type: object
+      required:
+      - event_id
+      - total_registered
+      - checked_in
+      - pending
+      title: AttendanceStatsOut
+    Body_bulk_import_users_auth_alias_auth_bulk_import_post:
+      properties:
+        file:
+          anyOf:
+          - type: string
+            contentMediaType: application/octet-stream
+          - type: 'null'
+          title: File
+        payload:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/BulkUserImportRow'
+            type: array
+          - type: 'null'
+          title: Payload
+      type: object
+      title: Body_bulk_import_users_auth_alias_auth_bulk_import_post
+    Body_bulk_import_users_users_bulk_import_post:
+      properties:
+        file:
+          anyOf:
+          - type: string
+            contentMediaType: application/octet-stream
+          - type: 'null'
+          title: File
+        payload:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/BulkUserImportRow'
+            type: array
+          - type: 'null'
+          title: Payload
+      type: object
+      title: Body_bulk_import_users_users_bulk_import_post
+    Body_create_inventory_bulk_inventory_bulk_import_post:
+      properties:
+        file:
+          anyOf:
+          - type: string
+            contentMediaType: application/octet-stream
+          - type: 'null'
+          title: File
+        payload:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/InventoryItemCreate'
+            type: array
+          - type: 'null'
+          title: Payload
+      type: object
+      title: Body_create_inventory_bulk_inventory_bulk_import_post
+    Body_create_inventory_bulk_inventory_bulk_post:
+      properties:
+        file:
+          anyOf:
+          - type: string
+            contentMediaType: application/octet-stream
+          - type: 'null'
+          title: File
+        payload:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/InventoryItemCreate'
+            type: array
+          - type: 'null'
+          title: Payload
+      type: object
+      title: Body_create_inventory_bulk_inventory_bulk_post
+    Body_create_venues_bulk_venues_bulk_import_post:
+      properties:
+        file:
+          anyOf:
+          - type: string
+            contentMediaType: application/octet-stream
+          - type: 'null'
+          title: File
+        payload:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/VenueCreate'
+            type: array
+          - type: 'null'
+          title: Payload
+      type: object
+      title: Body_create_venues_bulk_venues_bulk_import_post
+    Body_create_venues_bulk_venues_bulk_post:
+      properties:
+        file:
+          anyOf:
+          - type: string
+            contentMediaType: application/octet-stream
+          - type: 'null'
+          title: File
+        payload:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/VenueCreate'
+            type: array
+          - type: 'null'
+          title: Payload
+      type: object
+      title: Body_create_venues_bulk_venues_bulk_post
+    Body_upload_bill_expenses__expense_id__upload_bill_post:
+      properties:
+        bill_amount:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Bill Amount
+        file:
+          anyOf:
+          - type: string
+            contentMediaType: application/octet-stream
+          - type: 'null'
+          title: File
+      type: object
+      required:
+      - bill_amount
+      title: Body_upload_bill_expenses__expense_id__upload_bill_post
+    BookingCreate:
+      properties:
+        venue_id:
+          type: integer
+          title: Venue Id
+        event_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Event Id
+        club_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Club Id
+        event_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Event Name
+        booking_date:
+          type: string
+          format: date
+          title: Booking Date
+        time_slot:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time Slot
+        requirements:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: string
+          - type: 'null'
+          title: Requirements
+        status:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status
+          default: Confirmed
+      type: object
+      required:
+      - venue_id
+      - booking_date
+      title: BookingCreate
+    BookingOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        venue_id:
+          type: integer
+          title: Venue Id
+        event_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Event Id
+        club_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Club Id
+        club_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Club Name
+        venue_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Venue Name
+        event_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Event Name
+        booking_date:
+          type: string
+          format: date
+          title: Booking Date
+        time_slot:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time Slot
+        requirements:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Requirements
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - id
+      - venue_id
+      - booking_date
+      - status
+      title: BookingOut
+    BookingStatusUpdate:
+      properties:
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - status
+      title: BookingStatusUpdate
+    BudgetOverviewOut:
+      properties:
+        clubs:
+          items:
+            $ref: '#/components/schemas/ClubBudgetOverview'
+          type: array
+          title: Clubs
+        total_allocated:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Total Allocated
+        total_spent:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Total Spent
+        active_bookings:
+          type: integer
+          title: Active Bookings
+        inventory_on_loan:
+          type: integer
+          title: Inventory On Loan
+      type: object
+      required:
+      - clubs
+      - total_allocated
+      - total_spent
+      - active_bookings
+      - inventory_on_loan
+      title: BudgetOverviewOut
+    BulkInventoryItemResult:
+      properties:
+        index:
+          type: integer
+          title: Index
+        name:
+          type: string
+          title: Name
+        status:
+          type: string
+          title: Status
+        inventory_item:
+          anyOf:
+          - $ref: '#/components/schemas/InventoryItemOut'
+          - type: 'null'
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - index
+      - name
+      - status
+      title: BulkInventoryItemResult
+    BulkInventoryOut:
+      properties:
+        total:
+          type: integer
+          title: Total
+        created:
+          type: integer
+          title: Created
+        failed:
+          type: integer
+          title: Failed
+        results:
+          items:
+            $ref: '#/components/schemas/BulkInventoryItemResult'
+          type: array
+          title: Results
+      type: object
+      required:
+      - total
+      - created
+      - failed
+      - results
+      title: BulkInventoryOut
+    BulkUserImportOut:
+      properties:
+        total:
+          type: integer
+          title: Total
+        imported:
+          type: integer
+          title: Imported
+        failed:
+          type: integer
+          title: Failed
+        results:
+          items:
+            $ref: '#/components/schemas/BulkUserImportRowResult'
+          type: array
+          title: Results
+      type: object
+      required:
+      - total
+      - imported
+      - failed
+      - results
+      title: BulkUserImportOut
+    BulkUserImportRow:
+      properties:
+        student_id:
+          type: string
+          title: Student Id
+        name:
+          type: string
+          title: Name
+        email:
+          type: string
+          format: email
+          title: Email
+        password:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Password
+          default: student@123
+        department:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Department
+        year:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Year
+        role:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Role
+          default: Student
+        club_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Club Id
+      type: object
+      required:
+      - student_id
+      - name
+      - email
+      title: BulkUserImportRow
+    BulkUserImportRowResult:
+      properties:
+        row:
+          type: integer
+          title: Row
+        email:
+          type: string
+          title: Email
+        status:
+          type: string
+          title: Status
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - row
+      - email
+      - status
+      title: BulkUserImportRowResult
+    BulkVenueItemResult:
+      properties:
+        index:
+          type: integer
+          title: Index
+        name:
+          type: string
+          title: Name
+        status:
+          type: string
+          title: Status
+        venue:
+          anyOf:
+          - $ref: '#/components/schemas/VenueOut'
+          - type: 'null'
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - index
+      - name
+      - status
+      title: BulkVenueItemResult
+    BulkVenueOut:
+      properties:
+        total:
+          type: integer
+          title: Total
+        created:
+          type: integer
+          title: Created
+        failed:
+          type: integer
+          title: Failed
+        results:
+          items:
+            $ref: '#/components/schemas/BulkVenueItemResult'
+          type: array
+          title: Results
+      type: object
+      required:
+      - total
+      - created
+      - failed
+      - results
+      title: BulkVenueOut
+    CertificateOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        event_id:
+          type: integer
+          title: Event Id
+        user_id:
+          type: integer
+          title: User Id
+        reason:
+          type: string
+          title: Reason
+        issued_at:
+          type: string
+          format: date-time
+          title: Issued At
+      type: object
+      required:
+      - id
+      - event_id
+      - user_id
+      - reason
+      - issued_at
+      title: CertificateOut
+    ChatMessageCreate:
+      properties:
+        student_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Student Id
+        text:
+          type: string
+          title: Text
+      type: object
+      required:
+      - text
+      title: ChatMessageCreate
+    ChatMessageOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        club_id:
+          type: integer
+          title: Club Id
+        student_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Student Id
+        sender_id:
+          type: integer
+          title: Sender Id
+        sender_role:
+          type: string
+          title: Sender Role
+        text:
+          type: string
+          title: Text
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - club_id
+      - sender_id
+      - sender_role
+      - text
+      - created_at
+      title: ChatMessageOut
+    ClubBudgetOverview:
+      properties:
+        club_id:
+          type: integer
+          title: Club Id
+        club_name:
+          type: string
+          title: Club Name
+        allocated:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Allocated
+        spent:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Spent
+      type: object
+      required:
+      - club_id
+      - club_name
+      - allocated
+      - spent
+      title: ClubBudgetOverview
+    ClubCreate:
+      properties:
+        name:
+          type: string
+          title: Name
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        history:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: History
+        achievements:
+          items:
+            type: string
+          type: array
+          title: Achievements
+          default: []
+        club_head_email:
+          anyOf:
+          - type: string
+            format: email
+          - type: 'null'
+          title: Club Head Email
+          description: Defaults to <clubname-slug>@iitm.in if omitted
+        club_head_password:
+          anyOf:
+          - type: string
+            minLength: 6
+          - type: 'null'
+          title: Club Head Password
+          description: Defaults to <clubname-slug>123 if omitted
+      type: object
+      required:
+      - name
+      title: ClubCreate
+    ClubCreateResponse:
+      properties:
+        club:
+          $ref: '#/components/schemas/ClubOut'
+        club_head:
+          $ref: '#/components/schemas/ClubHeadCredentialsOut'
+      type: object
+      required:
+      - club
+      - club_head
+      title: ClubCreateResponse
+    ClubFinanceOut:
+      properties:
+        club_id:
+          type: integer
+          title: Club Id
+        allotted:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Allotted
+        spent:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Spent
+        remaining:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Remaining
+      type: object
+      required:
+      - club_id
+      - allotted
+      - spent
+      - remaining
+      title: ClubFinanceOut
+    ClubHeadCredentialsOut:
+      properties:
+        email:
+          type: string
+          title: Email
+        password:
+          type: string
+          title: Password
+        note:
+          type: string
+          title: Note
+          default: Share these with the incoming Club Head -- this is the only time
+            the password is returned in plaintext.
+      type: object
+      required:
+      - email
+      - password
+      title: ClubHeadCredentialsOut
+    ClubHeadPasswordReset:
+      properties:
+        password:
+          type: string
+          minLength: 6
+          title: Password
+      type: object
+      required:
+      - password
+      title: ClubHeadPasswordReset
+    ClubHeadPasswordResetOut:
+      properties:
+        email:
+          type: string
+          title: Email
+        password:
+          type: string
+          title: Password
+        note:
+          type: string
+          title: Note
+          default: Share this with the Club Head -- this is the only time the new
+            password is returned in plaintext.
+      type: object
+      required:
+      - email
+      - password
+      title: ClubHeadPasswordResetOut
+    ClubMemberOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        club_id:
+          type: integer
+          title: Club Id
+        user_id:
+          type: integer
+          title: User Id
+        status:
+          type: string
+          title: Status
+        joined_on:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Joined On
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        student_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Student Id
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        department:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Department
+        year:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Year
+      type: object
+      required:
+      - id
+      - club_id
+      - user_id
+      - status
+      title: ClubMemberOut
+    ClubOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        name:
+          type: string
+          title: Name
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        history:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: History
+        achievements:
+          items:
+            type: string
+          type: array
+          title: Achievements
+          default: []
+        status:
+          type: string
+          title: Status
+        president_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: President Id
+        faculty_coordinator_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Faculty Coordinator Id
+        budget_allotted:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Budget Allotted
+          default: '0'
+        budget_spent:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Budget Spent
+          default: '0'
+      type: object
+      required:
+      - id
+      - name
+      - status
+      title: ClubOut
+    ClubReview:
+      properties:
+        approve:
+          type: boolean
+          title: Approve
+      type: object
+      required:
+      - approve
+      title: ClubReview
+    ClubUpdate:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+        history:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: History
+      type: object
+      title: ClubUpdate
+    DomainCreate:
+      properties:
+        title:
+          type: string
+          title: Title
+        recruitment_open:
+          type: boolean
+          title: Recruitment Open
+          default: false
+      type: object
+      required:
+      - title
+      title: DomainCreate
+    DomainOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        club_id:
+          type: integer
+          title: Club Id
+        title:
+          type: string
+          title: Title
+        recruitment_open:
+          type: boolean
+          title: Recruitment Open
+        opened_on:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Opened On
+      type: object
+      required:
+      - id
+      - club_id
+      - title
+      - recruitment_open
+      title: DomainOut
+    ErrorOut:
+      properties:
+        detail:
+          type: string
+          title: Detail
+      type: object
+      required:
+      - detail
+      title: ErrorOut
+    EventBudgetCommentUpdate:
+      properties:
+        comment:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Comment
+      type: object
+      title: EventBudgetCommentUpdate
+    EventBudgetCreate:
+      properties:
+        event_name:
+          type: string
+          title: Event Name
+        allotted:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Allotted
+        proposal_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Proposal Id
+      type: object
+      required:
+      - event_name
+      - allotted
+      title: EventBudgetCreate
+    EventBudgetOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        club_id:
+          type: integer
+          title: Club Id
+        proposal_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Proposal Id
+        event_name:
+          type: string
+          title: Event Name
+        allotted:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Allotted
+        status:
+          type: string
+          title: Status
+        closed_on:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Closed On
+        comment:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Comment
+      type: object
+      required:
+      - id
+      - club_id
+      - event_name
+      - allotted
+      - status
+      title: EventBudgetOut
+    EventOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        proposal_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Proposal Id
+        club_id:
+          type: integer
+          title: Club Id
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        venue_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Venue Id
+        event_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Event Date
+        registration_deadline:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Registration Deadline
+        published:
+          type: boolean
+          title: Published
+        finalized:
+          type: boolean
+          title: Finalized
+      type: object
+      required:
+      - id
+      - club_id
+      - name
+      - published
+      - finalized
+      title: EventOut
+    EventProposalAssistRequest:
+      properties:
+        event_name:
+          type: string
+          minLength: 1
+          title: Event Name
+          description: Name / title of the proposed event
+        objective:
+          type: string
+          minLength: 1
+          title: Objective
+          description: Purpose or goal of the event
+        expected_participants:
+          type: integer
+          exclusiveMinimum: 0.0
+          title: Expected Participants
+          description: Estimated number of attendees
+      type: object
+      required:
+      - event_name
+      - objective
+      - expected_participants
+      title: EventProposalAssistRequest
+      description: Club Head provides the basic idea; AI generates the full proposal
+        content.
+    EventProposalAssistResponse:
+      properties:
+        source:
+          type: string
+          title: Source
+          description: '"gemini" if the LLM produced the content, "heuristic" otherwise'
+        event_description:
+          type: string
+          title: Event Description
+        agenda:
+          items:
+            $ref: '#/components/schemas/AgendaItem'
+          type: array
+          title: Agenda
+          default: []
+        budget_estimate:
+          type: number
+          title: Budget Estimate
+          description: Estimated total budget in INR
+        required_inventory:
+          items:
+            $ref: '#/components/schemas/InventoryItemSuggestion'
+          type: array
+          title: Required Inventory
+          default: []
+        volunteers_required:
+          type: integer
+          title: Volunteers Required
+        risk_assessment:
+          type: string
+          title: Risk Assessment
+        timeline:
+          items:
+            $ref: '#/components/schemas/TimelinePhase'
+          type: array
+          title: Timeline
+          default: []
+      type: object
+      required:
+      - source
+      - event_description
+      - budget_estimate
+      - volunteers_required
+      - risk_assessment
+      title: EventProposalAssistResponse
+    EventProposalCreate:
+      properties:
+        club_id:
+          type: integer
+          title: Club Id
+        event_name:
+          type: string
+          title: Event Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        schedule_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Schedule Date
+        time_slot:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time Slot
+        estimated_participants:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Estimated Participants
+        capacity_required:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Capacity Required
+        line_items_json:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Line Items Json
+        venue_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Venue Id
+        budget_estimate:
+          anyOf:
+          - type: number
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          - type: 'null'
+          title: Budget Estimate
+      type: object
+      required:
+      - club_id
+      - event_name
+      title: EventProposalCreate
+    EventProposalOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        club_id:
+          type: integer
+          title: Club Id
+        event_name:
+          type: string
+          title: Event Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        schedule_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Schedule Date
+        time_slot:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time Slot
+        estimated_participants:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Estimated Participants
+        capacity_required:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Capacity Required
+        line_items_json:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Line Items Json
+        venue_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Venue Id
+        budget_estimate:
+          anyOf:
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          - type: 'null'
+          title: Budget Estimate
+        status:
+          type: string
+          title: Status
+        submitted_by:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Submitted By
+        rejection_reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Rejection Reason
+      type: object
+      required:
+      - id
+      - club_id
+      - event_name
+      - status
+      title: EventProposalOut
+    EventProposalUpdate:
+      properties:
+        club_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Club Id
+        event_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Event Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        schedule_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Schedule Date
+        time_slot:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time Slot
+        estimated_participants:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Estimated Participants
+        capacity_required:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Capacity Required
+        line_items_json:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Line Items Json
+        venue_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Venue Id
+        budget_estimate:
+          anyOf:
+          - type: number
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          - type: 'null'
+          title: Budget Estimate
+      type: object
+      title: EventProposalUpdate
+    ExpenseCreate:
+      properties:
+        item_name:
+          type: string
+          title: Item Name
+        type:
+          type: string
+          title: Type
+          description: 'One of: Self-Procured Expense, Prize Money, Judge/Guest Fee'
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+        approved_amount:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Approved Amount
+        source:
+          type: string
+          title: Source
+          description: proposal or manual
+          default: proposal
+        bill_file_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Bill File Name
+          description: manual entries only -- the amount/file are both known upfront
+      type: object
+      required:
+      - item_name
+      - type
+      - approved_amount
+      title: ExpenseCreate
+    ExpenseJudgeDetails:
+      properties:
+        bill_amount:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Bill Amount
+        judge_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Judge Name
+        judge_contact:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Judge Contact
+        bank_details:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Bank Details
+      type: object
+      required:
+      - bill_amount
+      title: ExpenseJudgeDetails
+    ExpenseOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        event_budget_id:
+          type: integer
+          title: Event Budget Id
+        item_name:
+          type: string
+          title: Item Name
+        type:
+          type: string
+          title: Type
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+        approved_amount:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Approved Amount
+        bill_amount:
+          anyOf:
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          - type: 'null'
+          title: Bill Amount
+        bill_file_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Bill File Name
+        bill_file_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Bill File Url
+        status:
+          type: string
+          title: Status
+        source:
+          type: string
+          title: Source
+        comment:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Comment
+        prize_student_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prize Student Name
+        prize_student_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prize Student Id
+        prize_department:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prize Department
+        prize_affiliation:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prize Affiliation
+        prize_bank_details:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prize Bank Details
+        judge_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Judge Name
+        judge_contact:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Judge Contact
+        judge_bank_details:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Judge Bank Details
+      type: object
+      required:
+      - id
+      - event_budget_id
+      - item_name
+      - type
+      - approved_amount
+      - status
+      - source
+      title: ExpenseOut
+    ExpensePrizeDetails:
+      properties:
+        bill_amount:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Bill Amount
+        student_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Student Name
+        student_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Student Id
+        department:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Department
+        affiliation:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Affiliation
+        bank_details:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Bank Details
+      type: object
+      required:
+      - bill_amount
+      title: ExpensePrizeDetails
+    ExpenseReview:
+      properties:
+        approve:
+          type: boolean
+          title: Approve
+      type: object
+      required:
+      - approve
+      title: ExpenseReview
+    FacultyBudgetPoolOut:
+      properties:
+        total:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Total
+      type: object
+      required:
+      - total
+      title: FacultyBudgetPoolOut
+    FacultyBudgetPoolUpdate:
+      properties:
+        total:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Total
+      type: object
+      required:
+      - total
+      title: FacultyBudgetPoolUpdate
+    FinalizeEventOut:
+      properties:
+        event:
+          $ref: '#/components/schemas/EventOut'
+        certificates_issued:
+          items:
+            $ref: '#/components/schemas/CertificateOut'
+          type: array
+          title: Certificates Issued
+      type: object
+      required:
+      - event
+      - certificates_issued
+      title: FinalizeEventOut
+    FinanceTransactionCreate:
+      properties:
+        type:
+          type: string
+          title: Type
+          description: 'One of: Allocation, Expense Reimbursement, Adjustment'
+        amount:
+          anyOf:
+          - type: number
+            exclusiveMinimum: 0.0
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Amount
+          description: Unsigned magnitude; sign is derived server-side from `type`
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      type: object
+      required:
+      - type
+      - amount
+      title: FinanceTransactionCreate
+    FinanceTransactionOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        club_id:
+          type: integer
+          title: Club Id
+        type:
+          type: string
+          title: Type
+        amount:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Amount
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - club_id
+      - type
+      - amount
+      - created_at
+      title: FinanceTransactionOut
+    GlobalFinanceTransactionCreate:
+      properties:
+        club_id:
+          type: integer
+          title: Club Id
+        type:
+          type: string
+          title: Type
+          description: Credit or Debit
+        amount:
+          anyOf:
+          - type: number
+            exclusiveMinimum: 0.0
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Amount
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      type: object
+      required:
+      - club_id
+      - type
+      - amount
+      title: GlobalFinanceTransactionCreate
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    InventoryItemCreate:
+      properties:
+        code:
+          type: string
+          title: Code
+        name:
+          type: string
+          title: Name
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+        total_stock:
+          type: integer
+          title: Total Stock
+        available_stock:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Available Stock
+      type: object
+      required:
+      - code
+      - name
+      - total_stock
+      title: InventoryItemCreate
+    InventoryItemOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        code:
+          type: string
+          title: Code
+        name:
+          type: string
+          title: Name
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+        total_stock:
+          type: integer
+          title: Total Stock
+        available_stock:
+          type: integer
+          title: Available Stock
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - id
+      - code
+      - name
+      - total_stock
+      - available_stock
+      - status
+      title: InventoryItemOut
+    InventoryItemSuggestion:
+      properties:
+        item:
+          type: string
+          title: Item
+        quantity:
+          type: integer
+          title: Quantity
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+      type: object
+      required:
+      - item
+      - quantity
+      title: InventoryItemSuggestion
+    InventoryItemUpdate:
+      properties:
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+        total_stock:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Total Stock
+        available_stock:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Available Stock
+      type: object
+      title: InventoryItemUpdate
+    InventoryUsageCreate:
+      properties:
+        item_id:
+          type: integer
+          title: Item Id
+        event_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Event Id
+        club_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Club Id
+        event_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Event Name
+        venue_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Venue Id
+        location:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Location
+        quantity:
+          type: integer
+          title: Quantity
+        booking_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Booking Date
+        time_slot:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time Slot
+        status:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status
+          default: Booked
+      type: object
+      required:
+      - item_id
+      - quantity
+      title: InventoryUsageCreate
+    InventoryUsageOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        item_id:
+          type: integer
+          title: Item Id
+        item_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Item Name
+        event_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Event Id
+        club_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Club Id
+        club_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Club Name
+        event_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Event Name
+        venue_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Venue Id
+        location:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Location
+        quantity:
+          type: integer
+          title: Quantity
+        booking_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Booking Date
+        time_slot:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time Slot
+        checked_out_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Checked Out At
+        returned_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Returned At
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - id
+      - item_id
+      - quantity
+      - status
+      title: InventoryUsageOut
+    NotificationCreate:
+      properties:
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - message
+      title: NotificationCreate
+    NotificationDigestRequest:
+      properties:
+        notifications:
+          items:
+            $ref: '#/components/schemas/NotificationIn'
+          type: array
+          title: Notifications
+      type: object
+      required:
+      - notifications
+      title: NotificationDigestRequest
+    NotificationDigestResponse:
+      properties:
+        source:
+          type: string
+          title: Source
+          description: '"gemini" if the LLM produced the digest, "heuristic" otherwise'
+        summary:
+          type: string
+          title: Summary
+        highlights:
+          items:
+            type: string
+          type: array
+          title: Highlights
+          default: []
+      type: object
+      required:
+      - source
+      - summary
+      title: NotificationDigestResponse
+    NotificationIn:
+      properties:
+        message:
+          type: string
+          title: Message
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+      type: object
+      required:
+      - message
+      title: NotificationIn
+    NotificationOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        user_id:
+          type: integer
+          title: User Id
+        message:
+          type: string
+          title: Message
+        read:
+          type: boolean
+          title: Read
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - user_id
+      - message
+      - read
+      - created_at
+      title: NotificationOut
+    ProposalReview:
+      properties:
+        approve:
+          type: boolean
+          title: Approve
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+      type: object
+      required:
+      - approve
+      title: ProposalReview
+    ProposalRevisionRequest:
+      properties:
+        reason:
+          type: string
+          title: Reason
+      type: object
+      required:
+      - reason
+      title: ProposalRevisionRequest
+    RegistrationOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        event_id:
+          type: integer
+          title: Event Id
+        user_id:
+          type: integer
+          title: User Id
+        qr_token:
+          type: string
+          title: Qr Token
+        status:
+          type: string
+          title: Status
+        registered_at:
+          type: string
+          format: date-time
+          title: Registered At
+        checked_in_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Checked In At
+      type: object
+      required:
+      - id
+      - event_id
+      - user_id
+      - qr_token
+      - status
+      - registered_at
+      title: RegistrationOut
+    ReportCreate:
+      properties:
+        report_type:
+          type: string
+          title: Report Type
+          description: 'One of: club_summary, event_summary, volunteer_summary, finance_summary,
+            comprehensive'
+        date_from:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Date From
+        date_to:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Date To
+      type: object
+      required:
+      - report_type
+      title: ReportCreate
+    ReportOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        report_type:
+          type: string
+          title: Report Type
+        title:
+          type: string
+          title: Title
+        date_from:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Date From
+        date_to:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Date To
+        data:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Data
+        generated_by:
+          type: integer
+          title: Generated By
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+      type: object
+      required:
+      - id
+      - report_type
+      - title
+      - generated_by
+      title: ReportOut
+    RoleOut:
+      properties:
+        role:
+          type: string
+          title: Role
+        club_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Club Id
+      type: object
+      required:
+      - role
+      title: RoleOut
+    StudentCertificateOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        event_id:
+          type: integer
+          title: Event Id
+        event_name:
+          type: string
+          title: Event Name
+        reason:
+          type: string
+          title: Reason
+        issued_at:
+          type: string
+          format: date-time
+          title: Issued At
+      type: object
+      required:
+      - id
+      - event_id
+      - event_name
+      - reason
+      - issued_at
+      title: StudentCertificateOut
+    StudentCreateManual:
+      properties:
+        student_id:
+          type: string
+          title: Student Id
+        name:
+          type: string
+          title: Name
+        email:
+          type: string
+          format: email
+          title: Email
+        password:
+          type: string
+          minLength: 6
+          title: Password
+        department:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Department
+        year:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Year
+      type: object
+      required:
+      - student_id
+      - name
+      - email
+      - password
+      title: StudentCreateManual
+    StudentDetailOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        student_id:
+          type: string
+          title: Student Id
+        name:
+          type: string
+          title: Name
+        email:
+          type: string
+          format: email
+          title: Email
+        department:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Department
+        year:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Year
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        roles:
+          items:
+            type: string
+          type: array
+          title: Roles
+          default: []
+        memberships:
+          items:
+            $ref: '#/components/schemas/StudentMembershipOut'
+          type: array
+          title: Memberships
+          default: []
+        registrations:
+          items:
+            $ref: '#/components/schemas/StudentRegistrationOut'
+          type: array
+          title: Registrations
+          default: []
+        certificates:
+          items:
+            $ref: '#/components/schemas/StudentCertificateOut'
+          type: array
+          title: Certificates
+          default: []
+      type: object
+      required:
+      - id
+      - student_id
+      - name
+      - email
+      title: StudentDetailOut
+    StudentMembershipOut:
+      properties:
+        club_id:
+          type: integer
+          title: Club Id
+        club_name:
+          type: string
+          title: Club Name
+        role:
+          type: string
+          title: Role
+      type: object
+      required:
+      - club_id
+      - club_name
+      - role
+      title: StudentMembershipOut
+    StudentRegistrationOut:
+      properties:
+        event_id:
+          type: integer
+          title: Event Id
+        event_name:
+          type: string
+          title: Event Name
+        status:
+          type: string
+          title: Status
+        qr_token:
+          type: string
+          title: Qr Token
+        checked_in_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Checked In At
+      type: object
+      required:
+      - event_id
+      - event_name
+      - status
+      - qr_token
+      title: StudentRegistrationOut
+    TaskCreate:
+      properties:
+        assigned_to:
+          type: integer
+          title: Assigned To
+          description: User id of the volunteer this task is assigned to
+        type:
+          type: string
+          title: Type
+          description: 'One of: Attendance, Procurement, Bill Upload, Custom'
+        title:
+          type: string
+          title: Title
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        priority:
+          type: string
+          title: Priority
+          description: 'One of: Low, Medium, High'
+          default: Medium
+        deadline:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Deadline
+        expense_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Expense Id
+          description: Only for type='Bill Upload' -- the Expense line item this task
+            covers
+      type: object
+      required:
+      - assigned_to
+      - type
+      - title
+      title: TaskCreate
+    TaskOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        event_id:
+          type: integer
+          title: Event Id
+        club_id:
+          type: integer
+          title: Club Id
+        assigned_to:
+          type: integer
+          title: Assigned To
+        assigned_by:
+          type: integer
+          title: Assigned By
+        type:
+          type: string
+          title: Type
+        title:
+          type: string
+          title: Title
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        priority:
+          type: string
+          title: Priority
+        deadline:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Deadline
+        expense_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Expense Id
+        status:
+          type: string
+          title: Status
+        proof_text:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Proof Text
+        proof_file_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Proof File Name
+        submitted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Submitted At
+        review_comment:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Review Comment
+        reviewed_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Reviewed At
+      type: object
+      required:
+      - id
+      - event_id
+      - club_id
+      - assigned_to
+      - assigned_by
+      - type
+      - title
+      - priority
+      - status
+      title: TaskOut
+    TaskProofSubmit:
+      properties:
+        proof_text:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Proof Text
+        proof_file_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Proof File Name
+      type: object
+      title: TaskProofSubmit
+    TaskReview:
+      properties:
+        verified:
+          type: boolean
+          title: Verified
+        comment:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Comment
+      type: object
+      required:
+      - verified
+      title: TaskReview
+    TimelinePhase:
+      properties:
+        phase:
+          type: string
+          title: Phase
+        start_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Start Date
+        end_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: End Date
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      type: object
+      required:
+      - phase
+      title: TimelinePhase
+    TokenOut:
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        token_type:
+          type: string
+          title: Token Type
+          default: bearer
+        user:
+          $ref: '#/components/schemas/UserOut'
+      type: object
+      required:
+      - access_token
+      - user
+      title: TokenOut
+    ChangePassword:
+      properties:
+        current_password:
+          type: string
+          title: Current Password
+        new_password:
+          type: string
+          minLength: 6
+          title: New Password
+      type: object
+      required:
+      - current_password
+      - new_password
+      title: ChangePassword
+    UserLogin:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+      - email
+      - password
+      title: UserLogin
+    UserOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        student_id:
+          type: string
+          title: Student Id
+        name:
+          type: string
+          title: Name
+        email:
+          type: string
+          format: email
+          title: Email
+        department:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Department
+        year:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Year
+        roles:
+          items:
+            $ref: '#/components/schemas/RoleOut'
+          type: array
+          title: Roles
+          default: []
+      type: object
+      required:
+      - id
+      - student_id
+      - name
+      - email
+      title: UserOut
+    UserRegister:
+      properties:
+        student_id:
+          type: string
+          title: Student Id
+        name:
+          type: string
+          title: Name
+        email:
+          type: string
+          format: email
+          title: Email
+        password:
+          type: string
+          minLength: 6
+          title: Password
+        department:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Department
+        year:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Year
+        role:
+          type: string
+          title: Role
+          description: 'One of: Student, Volunteer, ClubHead, ClubPresident, FacultyCoordinator'
+        club_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Club Id
+          description: Required for ClubHead/ClubPresident roles
+      type: object
+      required:
+      - student_id
+      - name
+      - email
+      - password
+      - role
+      title: UserRegister
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    VenueCreate:
+      properties:
+        name:
+          type: string
+          title: Name
+        capacity:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Capacity
+        location:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Location
+        facilities:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Facilities
+        requirements:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Requirements
+      type: object
+      required:
+      - name
+      title: VenueCreate
+    VenueOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        name:
+          type: string
+          title: Name
+        capacity:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Capacity
+        location:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Location
+        facilities:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Facilities
+        requirements:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Requirements
+      type: object
+      required:
+      - id
+      - name
+      title: VenueOut
+    VenueUpdate:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        capacity:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Capacity
+        location:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Location
+        facilities:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Facilities
+        requirements:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Requirements
+      type: object
+      title: VenueUpdate
+    VolunteerApplicationCreate:
+      properties:
+        domain_id:
+          type: integer
+          title: Domain Id
+        note:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Note
+      type: object
+      required:
+      - domain_id
+      title: VolunteerApplicationCreate
+    VolunteerApplicationOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        club_id:
+          type: integer
+          title: Club Id
+        domain_id:
+          type: integer
+          title: Domain Id
+        applicant_id:
+          type: integer
+          title: Applicant Id
+        applied_on:
+          type: string
+          format: date
+          title: Applied On
+        status:
+          type: string
+          title: Status
+        note:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Note
+        applicant_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Applicant Name
+        applicant_student_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Applicant Student Id
+        applicant_email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Applicant Email
+      type: object
+      required:
+      - id
+      - club_id
+      - domain_id
+      - applicant_id
+      - applied_on
+      - status
+      title: VolunteerApplicationOut
+  securitySchemes:
+    OAuth2PasswordBearer:
+      type: oauth2
+      flows:
+        password:
+          scopes: {}
+          tokenUrl: /auth/login

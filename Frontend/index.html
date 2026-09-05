@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSCMS - Sign In</title>
+    <script>
+        // Computes a correct <base> from the actual URL instead of a hardcoded
+        // absolute path, so relative script/asset paths resolve whether this
+        // file is opened directly (file://) or through a static server that
+        // redirects "/index.html" to a clean URL without the filename.
+        (function () {
+            var href = window.location.href.split(/[?#]/)[0];
+            var dir = href.endsWith(".html") ? href.substring(0, href.lastIndexOf("/") + 1) : (href.endsWith("/") ? href : href + "/");
+            var base = document.createElement("base");
+            base.href = dir;
+            document.head.appendChild(base);
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="shared/css/variables.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--bg-card);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-premium);
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--grad-primary);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header .logo-icon {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 1rem;
+            font-size: 1.7rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(2, 132, 199, 0.4);
+        }
+
+        .login-header h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #0f172a 0%, #0284c7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.35rem;
+        }
+
+        .role-grid {
+            display: grid;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-option {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.9rem 1rem;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .role-option:hover {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+            transform: translateX(3px);
+        }
+
+        .role-option.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(2, 132, 199, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
+        }
+
+        .role-option input {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
+        }
+
+        .role-option i {
+            width: 24px;
+            text-align: center;
+            color: var(--primary);
+            font-size: 1.15rem;
+        }
+
+        .role-option-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        #login-error {
+            display: none;
+            color: var(--danger);
+            font-size: 0.82rem;
+            margin-bottom: 1rem;
+        }
+
+        .demo-accounts {
+            margin-top: 1.5rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .demo-accounts summary {
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-accounts code {
+            font-size: 0.76rem;
+        }
+
+        .demo-accounts table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+
+        .demo-accounts td {
+            padding: 0.25rem 0.4rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        #login-submit[disabled] {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <div class="logo-icon">SS</div>
+            <h1>SSCMS Sign In</h1>
+            <p>Student Club Management System</p>
+        </div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label class="form-label" for="login-email">Email</label>
+                <input type="email" id="login-email" class="form-input" placeholder="e.g. facultycoord@iitm.in" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="login-password">Password</label>
+                <div class="password-input-wrap">
+                    <input type="password" id="login-password" class="form-input" placeholder="Password" required>
+                    <button type="button" class="toggle-password-btn" id="toggle-login-password" title="Show/Hide password" aria-label="Toggle password visibility">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <p id="login-error"></p>
+
+            <button type="submit" id="login-submit" class="btn btn-primary" style="width: 100%;">
+                Sign In <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </form>
+
+        <details class="demo-accounts">
+            <summary>Demo accounts</summary>
+            <table>
+                <tr><td>Faculty Coordinator</td><td><code>facultycoord@iitm.in</code></td><td><code>faculty123</code></td></tr>
+                <tr><td>Club President</td><td><code>studentpresident@iitm.in</code></td><td><code>president123</code></td></tr>
+                <tr><td>Club Head (Dance Club)</td><td><code>danceclub@iitm.in</code></td><td><code>danceclub123</code></td></tr>
+                <tr><td>Student</td><td><code>stu-001@iitm.in</code></td><td><code>student@123</code></td></tr>
+            </table>
+        </details>
+    </div>
+
+    <script src="shared/js/api-config.js"></script>
+    <script src="shared/js/api.js"></script>
+    <script src="shared/js/session.js"></script>
+    <script>
+        const DASHBOARD_PATHS = {
+            president: "president_dashboard/index.html",
+            facultycoordinator: "faculty_coordinator_dashboard/index.html",
+            clubhead: "club_head_dashboard/index.html",
+            user: "user_dashboard/index.html"
+        };
+
+        // If a valid session already exists (e.g. the user refreshed while
+        // logged in and landed back here, or opened a stale login bookmark),
+        // bounce them straight to their dashboard instead of showing the form.
+        const existingSession = (typeof getSession === "function") ? getSession() : null;
+        if (existingSession && existingSession.token) {
+            const target = DASHBOARD_PATHS[existingSession.role] || DASHBOARD_PATHS.user;
+            window.location.replace(target);
+        }
+
+        const form = document.getElementById("login-form");
+        const errorEl = document.getElementById("login-error");
+        const submitBtn = document.getElementById("login-submit");
+
+        // Password visibility toggle
+        const togglePwBtn = document.getElementById("toggle-login-password");
+        const pwInput = document.getElementById("login-password");
+        if (togglePwBtn && pwInput) {
+            togglePwBtn.addEventListener("click", () => {
+                const isPw = pwInput.type === "password";
+                pwInput.type = isPw ? "text" : "password";
+                togglePwBtn.innerHTML = isPw ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+            });
+        }
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            errorEl.style.display = "none";
+            const email = document.getElementById("login-email").value.trim();
+            const password = document.getElementById("login-password").value;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "Signing in&hellip;";
+            try {
+                const loginResponse = await Api.login(email, password);
+                const session = establishSessionFromLogin(loginResponse);
+                window.location.href = DASHBOARD_PATHS[session.role] || DASHBOARD_PATHS.user;
+            } catch (err) {
+                errorEl.textContent = err.detail || "Invalid email or password.";
+                errorEl.style.display = "block";
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = "Sign In <i class=\"fa-solid fa-arrow-right\"></i>";
+            }
+        });
+    </script>
+</body>
+
+</html>

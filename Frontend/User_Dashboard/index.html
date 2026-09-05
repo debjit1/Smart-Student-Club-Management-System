@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSCMS - Student Club Membership & Volunteering Portal</title>
+    <script>
+        // Computes a correct <base> from the actual URL instead of a hardcoded
+        // absolute path, so relative script/asset paths resolve whether this
+        // file is opened directly (file://) or through a static server that
+        // redirects "/index.html" to a clean URL without the filename.
+        (function () {
+            var href = window.location.href.split(/[?#]/)[0];
+            var dir = href.endsWith(".html") ? href.substring(0, href.lastIndexOf("/") + 1) : (href.endsWith("/") ? href : href + "/");
+            var base = document.createElement("base");
+            base.href = dir;
+            document.head.appendChild(base);
+        })();
+    </script>
+    <!-- CSS link -->
+    <link rel="stylesheet" href="styles.css?v=2.2">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <div class="logo-icon">SS</div>
+                <h2 class="logo-text">SSCMS</h2>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" data-tab="dashboard">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="clubs">
+                        <i class="fa-solid fa-people-group"></i>
+                        <span>Clubs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="events">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span>Events</span>
+                    </a>
+                </li>
+                <li class="nav-item hidden" id="nav-club-activities">
+                    <a class="nav-link" data-tab="club-activities">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Club Activities</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="calendar">
+                        <i class="fa-solid fa-calendar"></i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="certificates">
+                        <i class="fa-solid fa-award"></i>
+                        <span>Certificates</span>
+                    </a>
+                </li>
+                <li class="nav-item hidden" id="nav-chat">
+                    <a class="nav-link" data-tab="chat">
+                        <i class="fa-solid fa-comments"></i>
+                        <span>Chat</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Bottom User Profile Card -->
+            <div class="user-profile-card">
+                <div class="user-avatar" id="sidebar-avatar">MS</div>
+                <div class="user-info">
+                    <h4 class="user-name" id="sidebar-username">Mithra S S</h4>
+                    <p class="user-role" id="sidebar-userrole">Student Portal</p>
+                </div>
+                <button type="button" class="profile-icon-btn" id="change-password-btn" title="Change Password">
+                    <i class="fa-solid fa-key"></i>
+                </button>
+                <button class="logout-btn" id="logout-button" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-wrapper">
+            <!-- Top Header Bar -->
+            <header class="top-header">
+                <div class="header-title-container">
+                    <h1 id="page-title">Dashboard</h1>
+                    <p id="page-subtitle">Your personalized portal and upcoming opportunities</p>
+                </div>
+                <div class="header-actions">
+                    <!-- Global Search Bar -->
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="global-search" placeholder="Search events, clubs...">
+                    </div>
+                    <!-- Notification Bell -->
+                    <div class="notif-wrap">
+                        <button class="icon-btn" id="notification-bell">
+                            <i class="fa-solid fa-bell"></i>
+                            <span class="badge-dot hidden" id="notif-dot"></span>
+                        </button>
+                        <div class="notif-dropdown hidden" id="notif-dropdown">
+                            <div class="notif-dropdown-header">Notifications</div>
+                            <div class="notif-digest hidden" id="notif-digest"></div>
+                            <div class="notif-dropdown-list" id="notif-dropdown-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic View Containers -->
+
+            <!-- 1. DASHBOARD VIEW -->
+            <section id="dashboard-tab" class="tab-content active">
+                <!-- Welcome Card -->
+                <div class="welcome-banner">
+                    <div class="banner-content">
+                        <p class="banner-subtitle">STUDENT PORTAL</p>
+                        <h1 class="banner-title" id="welcome-message">Good morning, Mithra S S 👋</h1>
+                        <p class="banner-text">Browse clubs, register for events, and track your volunteering journey.</p>
+                    </div>
+                    <div class="banner-date">
+                        Today
+                        <span id="banner-current-date">17 July 2026</span>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon-wrapper blue">
+                            <i class="fa-solid fa-ticket"></i>
+                        </div>
+                        <div class="stat-details">
+                            <span class="stat-label">My Registrations</span>
+                            <span class="stat-value" id="stat-registrations">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon-wrapper purple">
+                            <i class="fa-solid fa-people-group"></i>
+                        </div>
+                        <div class="stat-details">
+                            <span class="stat-label">Clubs Joined</span>
+                            <span class="stat-value" id="stat-clubs-joined">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon-wrapper teal">
+                            <i class="fa-solid fa-hand-holding-heart"></i>
+                        </div>
+                        <div class="stat-details">
+                            <span class="stat-label">Volunteer Roles</span>
+                            <span class="stat-value" id="stat-volunteer-roles">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Content Layout split -->
+                <div class="dashboard-layout">
+                    <!-- Left: My Registrations -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3 class="section-title">
+                                <i class="fa-solid fa-ticket" style="color: var(--primary);"></i>
+                                My Registrations
+                            </h3>
+                            <a href="#" class="section-link" data-go-tab="events">Browse events &gt;</a>
+                        </div>
+                        <div class="registrations-list-min" id="dashboard-registrations-container">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Ongoing + Upcoming Events -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3 class="section-title">
+                                <i class="fa-solid fa-bolt" style="color: var(--success);"></i>
+                                Ongoing Events
+                            </h3>
+                        </div>
+                        <div class="registrations-list-min" id="dashboard-ongoing-container">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                        <div class="section-header" style="margin-top: 1.25rem;">
+                            <h3 class="section-title">
+                                <i class="fa-solid fa-calendar-plus" style="color: var(--info);"></i>
+                                Upcoming Events
+                            </h3>
+                            <a href="#" class="section-link" data-go-tab="events">View all &gt;</a>
+                        </div>
+                        <div class="registrations-list-min" id="dashboard-upcoming-container">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Featured Clubs Section -->
+                <div class="featured-clubs-section">
+                    <div class="featured-clubs-header">
+                        <h3 class="featured-clubs-title">Featured Clubs</h3>
+                        <a href="#" class="featured-clubs-link" data-go-tab="clubs">Explore All Clubs &gt;</a>
+                    </div>
+                    <div class="featured-clubs-carousel-wrapper">
+                        <div class="featured-clubs-grid" id="dashboard-clubs-container">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. EVENTS VIEW (attendee registration) -->
+            <section id="events-tab" class="tab-content">
+                <div class="view-filters-bar">
+                    <h2>Upcoming &amp; Ongoing Events</h2>
+                    <p class="text-muted-note">Register as an attendee — you'll get a QR code for check-in at the venue.</p>
+                </div>
+
+                <div class="cards-grid" id="events-cards-container">
+                    <!-- Injected by JavaScript -->
+                </div>
+            </section>
+
+            <!-- 3. CLUB ACTIVITIES VIEW (approved volunteers only) -->
+            <section id="club-activities-tab" class="tab-content">
+                <div id="club-activities-container">
+                    <!-- Injected by JavaScript -->
+                </div>
+            </section>
+
+            <!-- 4. CALENDAR VIEW -->
+            <section id="calendar-tab" class="tab-content">
+                <div class="calendar-layout">
+                    <!-- Calendar Card -->
+                    <div class="calendar-card">
+                        <div class="calendar-header">
+                            <h2 class="calendar-title" id="calendar-month-year">July 2026</h2>
+                            <div class="calendar-controls">
+                                <button class="cal-ctrl-btn" id="cal-prev-btn"><i
+                                        class="fa-solid fa-chevron-left"></i></button>
+                                <button class="cal-ctrl-btn" id="cal-next-btn"><i
+                                        class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="calendar-weekdays">
+                            <div>Sun</div>
+                            <div>Mon</div>
+                            <div>Tue</div>
+                            <div>Wed</div>
+                            <div>Thu</div>
+                            <div>Fri</div>
+                            <div>Sat</div>
+                        </div>
+
+                        <div class="calendar-days" id="calendar-days-container">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Agenda Sidebar -->
+                    <div class="agenda-panel">
+                        <h3 class="agenda-title" id="agenda-heading">Registered Agenda</h3>
+                        <div class="agenda-items" id="calendar-agenda-container">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. CERTIFICATES VIEW -->
+            <section id="certificates-tab" class="tab-content">
+                <div class="view-filters-bar">
+                    <h2>Earned Certificates</h2>
+                </div>
+                <div class="certificates-grid" id="certificates-cards-container">
+                    <!-- Injected by JavaScript -->
+                </div>
+            </section>
+
+            <!-- CHAT VIEW — one thread per club you're a Selected volunteer for -->
+            <section id="chat-tab" class="tab-content">
+                <div class="dashboard-card card-full" style="display:flex; height:65vh; overflow:hidden; padding:0;">
+                    <div id="stu-chat-club-list" style="width:220px; flex-shrink:0; border-right:1px solid var(--border-color); overflow-y:auto; padding:0.5rem;"></div>
+                    <div id="stu-chat-panel" style="flex:1; display:flex; flex-direction:column; overflow:hidden;"></div>
+                </div>
+            </section>
+
+            <!-- 6. CLUBS VIEW -->
+            <section id="clubs-tab" class="tab-content">
+                <div class="view-filters-bar">
+                    <h2>All Clubs</h2>
+                </div>
+                <div class="clubs-grid" id="clubs-grid-container">
+                    <!-- Injected by JavaScript -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODALS SECTION -->
+
+    <!-- Certificate Preview Modal -->
+    <div class="modal-overlay" id="certificate-modal">
+        <div class="modal-box" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Certificate Preview</h3>
+                <button class="modal-close-btn" id="close-cert-modal-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="certificate-preview-frame">
+                    <div class="cert-preview-logo">SSCMS</div>
+                    <h1 class="cert-preview-h1">CERTIFICATE OF PARTICIPATION</h1>
+                    <p class="cert-preview-p">This is proudly presented to</p>
+                    <div class="cert-preview-recipient">Mithra S S</div>
+                    <p class="cert-preview-p">for successfully participating and completing the requirements of the
+                        event</p>
+                    <h3 id="cert-preview-event-name"
+                        style="color: var(--primary); font-size: 1.3rem; margin: 0.5rem 0;"></h3>
+                    <p class="cert-preview-reason" id="cert-preview-details"></p>
+                </div>
+                <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button class="btn-secondary" id="cert-modal-close-btn"
+                        style="flex: none; padding: 0.6rem 1.5rem;">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Club Detail Modal -->
+    <div class="modal-overlay" id="club-explore-modal">
+        <div class="modal-box" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Club Details</h3>
+                <button class="modal-close-btn" id="close-club-modal-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="club-explore-modal-body">
+                <!-- Injected by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Volunteer Application Modal -->
+    <div class="modal-overlay" id="volunteer-application-modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title" id="volunteer-modal-title">Apply to Volunteer</h3>
+                <button class="modal-close-btn" id="close-volunteer-modal-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="volunteer-application-form">
+                    <div class="form-group">
+                        <label for="volunteer-domain-select">Domain</label>
+                        <select id="volunteer-domain-select" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="volunteer-note-input">Relevant Experience / Why this domain?</label>
+                        <textarea id="volunteer-note-input" class="form-control" rows="4"
+                            placeholder="Tell the Club Head about any relevant experience..." required></textarea>
+                    </div>
+                    <button type="submit" class="action-primary-btn" style="width: 100%; justify-content: center;">
+                        Submit Application
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration / Task Proof QR display Modal -->
+    <div class="modal-overlay" id="qr-view-modal">
+        <div class="modal-box" style="max-width: 380px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Your Registration QR Code</h3>
+                <button class="modal-close-btn" id="close-qr-view-modal-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="text-align:center;">
+                <p id="qr-view-event-name" style="font-weight:600; margin-bottom:0.75rem;"></p>
+                <canvas id="qr-view-canvas" width="220" height="220" style="margin:0 auto;"></canvas>
+                <p id="qr-view-checkin-status" style="font-size:0.8rem; color: var(--text-muted); margin-top:0.75rem;"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Proof Submission Modal -->
+    <div class="modal-overlay" id="task-proof-modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title" id="task-proof-modal-title">Submit Proof of Completion</h3>
+                <button class="modal-close-btn" id="close-task-proof-modal-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="task-proof-form">
+                    <div class="form-group">
+                        <label for="task-proof-note">Notes</label>
+                        <textarea id="task-proof-note" class="form-control" rows="3"
+                            placeholder="Describe what you completed..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-proof-link">Link (optional)</label>
+                        <input type="text" id="task-proof-link" class="form-control" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label for="task-proof-file">Attach a file (optional)</label>
+                        <input type="file" id="task-proof-file" class="form-control" accept="image/*,.pdf">
+                    </div>
+                    <button type="submit" class="action-primary-btn" style="width: 100%; justify-content: center;">
+                        Mark as Completed
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bill Upload Modal — for "Bill Upload" tasks (self-procured expense items) only.
+         Submitting this writes the bill directly into the Club Head's Logged Expenses & Bills. -->
+    <div class="modal-overlay" id="bill-upload-modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title" id="bill-upload-modal-title">Upload Bill</h3>
+                <button class="modal-close-btn" id="close-bill-upload-modal-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="bill-upload-form">
+                    <div class="form-group">
+                        <label>Item</label>
+                        <input type="text" id="bill-upload-item-display" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Approved Amount</label>
+                        <input type="text" id="bill-upload-approved-display" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="bill-upload-amount">Bill Amount (₹)</label>
+                        <input type="number" id="bill-upload-amount" class="form-control" min="0" placeholder="4800">
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin: -0.35rem 0 0.6rem 0;">
+                        Leave as 0 or blank if you weren't able to procure this item — no bill needed. Tell your Club
+                        Head why in person or over chat.
+                    </p>
+                    <div class="form-group">
+                        <label for="bill-upload-file">Upload Bill</label>
+                        <input type="file" id="bill-upload-file" class="form-control" accept="image/*,.pdf">
+                        <p id="bill-upload-file-hint" style="font-size: 0.72rem; color: var(--text-muted); margin: 0.35rem 0 0;"></p>
+                    </div>
+                    <button type="submit" class="action-primary-btn" style="width: 100%; justify-content: center;">
+                        Save Bill
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance QR Scanner Modal -->
+    <div class="modal-overlay" id="qr-scanner-modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title">Attendance QR Scanner</h3>
+                <button class="modal-close-btn" id="close-qr-scanner-modal-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.8rem; color:var(--text-muted);">Point a registrant's QR code at the camera. If
+                    the camera isn't available, enter their Registration ID manually below.</p>
+                <video id="stu-qr-video" style="width:100%; border-radius:8px; background:#000;" playsinline
+                    muted></video>
+                <canvas id="stu-qr-canvas" style="display:none;"></canvas>
+                <p id="stu-qr-scan-status" style="font-size:0.8rem; margin-top:0.5rem;"></p>
+                <div class="form-group" style="margin-top:0.75rem;">
+                    <label>Manual Entry (Registration ID)</label>
+                    <div style="display:flex; gap:0.5rem;">
+                        <input type="text" id="stu-qr-manual-input" class="form-control" placeholder="e.g. reg-1">
+                        <button type="button" class="btn-secondary" id="btn-stu-qr-manual-submit"
+                            style="flex: none; padding: 0.6rem 1rem;">Mark Present</button>
+                    </div>
+                </div>
+                <h4 style="margin-top:1.25rem;">Attendance History</h4>
+                <div class="table-responsive">
+                    <table class="mini-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Student ID</th>
+                                <th>Checked In At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stu-qr-attendance-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Change Password Modal (self-service, all roles) -->
+    <div class="modal-overlay" id="modal-change-password">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title">Change Password</h3>
+                <button class="modal-close-btn" id="close-change-password-modal-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-change-password">
+                    <div class="form-group">
+                        <label for="change-current-password">Current Password</label>
+                        <input type="password" id="change-current-password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="change-new-password">New Password</label>
+                        <input type="password" id="change-new-password" class="form-control" minlength="6" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="change-confirm-password">Confirm New Password</label>
+                        <input type="password" id="change-confirm-password" class="form-control" minlength="6" required>
+                    </div>
+                    <button type="submit" class="action-primary-btn" style="width: 100%; justify-content: center;">Update Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR generation / decoding (CDN, same pattern as the Club Head dashboard) -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Shared utility helpers (toast, date/time/currency formatting) -->
+    <script src="../shared/js/utils.js?v=1787505628"></script>
+    <script src="../shared/js/api-config.js?v=1787505628"></script>
+    <script src="../shared/js/api.js?v=1787505628"></script>
+    <!-- Application Scripts -->
+    <!-- Role session guard -->
+    <script src="../shared/js/session.js?v=1787505628"></script>
+    <script>
+        const __session = requireRole("user");
+        applySessionToSidebar(__session);
+    </script>
+    <!-- Shared state schema/seed + load/save (all 4 dashboards) -->
+    <script src="../shared/js/seed-data.js?v=1787505628"></script>
+    <script src="../shared/js/state-core.js?v=1787505628"></script>
+    <script src="../shared/js/change-password.js?v=1787505628"></script>
+    <script src="js/state.js?v=1787505628"></script>
+    <script src="js/dashboard.js?v=1787505628"></script>
+    <script src="js/clubs.js?v=1787505628"></script>
+    <script src="js/events.js?v=1787505628"></script>
+    <script src="js/clubActivities.js?v=1787505628"></script>
+    <script src="js/calendar.js?v=1787505628"></script>
+    <script src="js/certificates.js?v=1787505628"></script>
+    <script src="js/chat.js?v=1787505628"></script>
+    <script src="app.js?v=1787505628"></script>
+</body>
+
+</html>

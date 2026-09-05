@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Head Portal - SSCMS</title>
+    <script>
+        // Computes a correct <base> from the actual URL instead of a hardcoded
+        // absolute path, so relative script/asset paths resolve whether this
+        // file is opened directly (file://) or through a static server that
+        // redirects "/index.html" to a clean URL without the filename.
+        (function () {
+            var href = window.location.href.split(/[?#]/)[0];
+            var dir = href.endsWith(".html") ? href.substring(0, href.lastIndexOf("/") + 1) : (href.endsWith("/") ? href : href + "/");
+            var base = document.createElement("base");
+            base.href = dir;
+            document.head.appendChild(base);
+        })();
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Shared Custom CSS (same stylesheet as President Portal, for identical UI) -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Club Head specific additions (searchable dropdowns, dynamic form rows) -->
+    <link rel="stylesheet" href="extra.css?v=1786108295">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <div class="logo-icon">C</div>
+                <div class="logo-text">SSCMS <span class="badge-role">Club Head</span></div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" data-tab="dashboard">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="proposals">
+                        <i class="fa-solid fa-file-signature"></i>
+                        <span>Event Proposals</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="eventmgmt">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <span>Event Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="members">
+                        <i class="fa-solid fa-users"></i>
+                        <span>Manage Members</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="volunteers">
+                        <i class="fa-solid fa-user-group"></i>
+                        <span>Volunteer Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="finances">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Club Finances</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="volunteerchat">
+                        <i class="fa-solid fa-comments"></i>
+                        <span>Volunteer Chat</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-profile-card">
+                <div class="user-avatar" id="sidebar-avatar">AV</div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebar-username">Aditya Verma</div>
+                    <div class="user-role" id="sidebar-userrole">Club Head · Robotix Club</div>
+                </div>
+                <button type="button" class="profile-icon-btn" id="change-password-btn" title="Change Password">
+                    <i class="fa-solid fa-key"></i>
+                </button>
+                <a href="../index.html" class="logout-btn" title="Log out">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-wrapper">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-title-container">
+                    <h1 id="page-title">Club Head Dashboard</h1>
+                    <p id="page-subtitle">Welcome back. Here is an overview of your club's activities, members, and events.</p>
+                </div>
+            </header>
+
+            <!-- Toast Container -->
+            <div id="toast-container" class="toast-container"></div>
+
+            <!-- ============================================================
+                 VIEW 1: DASHBOARD OVERVIEW (Club Head)
+            ============================================================= -->
+            <section id="tab-dashboard" class="tab-pane active">
+                <!-- Stats Counter Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-indigo-glow"><i class="fa-solid fa-users text-indigo"></i></div>
+                        <div class="stat-content">
+                            <span class="stat-label">Club Members</span>
+                            <h2 class="stat-value" id="ch-stat-members-count">0</h2>
+                            <span class="stat-trend trend-neutral" id="ch-stat-members-pending"><i class="fa-solid fa-clock"></i> 0 pending</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-emerald-glow"><i class="fa-solid fa-calendar-check text-emerald"></i></div>
+                        <div class="stat-content">
+                            <span class="stat-label">Approved Events</span>
+                            <h2 class="stat-value" id="ch-stat-events-count">0</h2>
+                            <span class="stat-trend trend-success" id="ch-stat-events-active"><i class="fa-solid fa-circle-check"></i> Active</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-purple-glow"><i class="fa-solid fa-file-signature text-purple"></i></div>
+                        <div class="stat-content">
+                            <span class="stat-label">Event Proposals</span>
+                            <h2 class="stat-value" id="ch-stat-proposals-count">0</h2>
+                            <span class="stat-trend trend-warning" id="ch-stat-proposals-review"><i class="fa-solid fa-hourglass-half"></i> 0 in review</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-amber-glow"><i class="fa-solid fa-user-group text-amber"></i></div>
+                        <div class="stat-content">
+                            <span class="stat-label">Volunteers</span>
+                            <h2 class="stat-value" id="ch-stat-volunteers-count">0</h2>
+                            <span class="stat-trend trend-info" id="ch-stat-domains-count"><i class="fa-solid fa-layer-group"></i> 0 domains</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-blue-glow"><i class="fa-solid fa-wallet text-blue"></i></div>
+                        <div class="stat-content">
+                            <span class="stat-label">Budget Remaining</span>
+                            <h2 class="stat-value" id="ch-stat-budget-remaining">₹0</h2>
+                            <span class="stat-trend trend-neutral" id="ch-stat-budget-spent">₹0 spent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Content Grid -->
+                <div class="dashboard-grid">
+                    <!-- Left: Recent & Upcoming Events -->
+                    <div class="dashboard-card card-large">
+                        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3><i class="fa-solid fa-calendar-days text-indigo"></i> Upcoming Club Events</h3>
+                            <button class="btn btn-secondary btn-sm" id="ch-dash-view-events-btn">View Event Manager</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Event Name</th>
+                                            <th>Date &amp; Time</th>
+                                            <th>Venue</th>
+                                            <th>Registrations</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ch-dash-events-tbody">
+                                        <!-- Dynamic upcoming events -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Quick Actions & Club Summary -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-bolt text-amber"></i> Quick Actions</h3>
+                        </div>
+                        <div class="card-body" style="display:flex; flex-direction:column; gap:0.75rem;">
+                            <button class="btn btn-primary" id="ch-quick-new-proposal" style="justify-content:flex-start; text-align:left;">
+                                <i class="fa-solid fa-plus"></i> Submit New Event Proposal
+                            </button>
+                            <button class="btn btn-outline" id="ch-quick-manage-members" style="justify-content:flex-start; text-align:left;">
+                                <i class="fa-solid fa-user-check text-indigo"></i> Review Member Requests
+                            </button>
+                            <button class="btn btn-outline" id="ch-quick-volunteers" style="justify-content:flex-start; text-align:left;">
+                                <i class="fa-solid fa-hand-holding-hand text-emerald"></i> Volunteer Recruitment
+                            </button>
+                            <button class="btn btn-outline" id="ch-quick-finances" style="justify-content:flex-start; text-align:left;">
+                                <i class="fa-solid fa-money-bill-wave text-amber"></i> View Finances &amp; Bills
+                            </button>
+                            <button class="btn btn-outline" id="ch-quick-chat" style="justify-content:flex-start; text-align:left;">
+                                <i class="fa-solid fa-comments text-purple"></i> Open Volunteer Chat
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Left: Volunteer & Domain Recruitment Summary -->
+                    <div class="dashboard-card card-large">
+                        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3><i class="fa-solid fa-layer-group text-emerald"></i> Active Recruitment Domains</h3>
+                            <span class="badge badge-info" id="ch-dash-domains-badge">0 Domains</span>
+                        </div>
+                        <div class="card-body">
+                            <ul class="venue-quick-list" id="ch-dash-domains-list">
+                                <!-- Dynamic domains list -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 VIEW 2: EVENT PROPOSALS (Club Head)
+            ============================================================= -->
+            <section id="tab-proposals" class="tab-pane">
+
+                <!-- ── 1. GALLERY VIEW ─────────────────────────────────── -->
+                <div id="ch-gallery-view">
+                    <div class="view-actions-bar">
+                        <div class="filters-row">
+                            <h3 class="section-title">Your Submitted Proposals</h3>
+                            <span class="badge badge-warning" id="ch-pending-count"
+                                style="margin-left: 10px;">0 Pending</span>
+                        </div>
+                        <button class="btn btn-primary" id="btn-new-proposal">
+                            <i class="fa-solid fa-plus"></i> New Proposal
+                        </button>
+                    </div>
+
+                    <h4
+                        style="margin: 1.5rem 0 1rem 0; color: var(--text-main); font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">
+                        <i class="fa-solid fa-hourglass-half text-warning"></i> Under Review / Needs Action</h4>
+                    <div class="proposals-gallery-grid" id="ch-review-grid" style="margin-bottom: 2.5rem;">
+                        <!-- Dynamic proposal cards -->
+                    </div>
+
+                    <h4
+                        style="margin: 1.5rem 0 1rem 0; color: var(--text-main); font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">
+                        <i class="fa-solid fa-circle-check text-success"></i> Approved Events</h4>
+                    <div class="proposals-gallery-grid" id="ch-approved-grid">
+                        <!-- Dynamic approved cards -->
+                    </div>
+                </div>
+
+                <!-- ── 2. NEW / REVISE PROPOSAL FORM VIEW ──────────────── -->
+                <div id="ch-form-view" class="hidden">
+                    <button class="btn btn-secondary mb-3" id="btn-back-from-form" style="margin-bottom: 1.5rem;">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Gallery
+                    </button>
+
+                    <div class="dashboard-card ch-form-card" id="ch-form-card">
+                        <div class="card-header">
+                            <h3 id="ch-form-title">New Event Proposal</h3>
+                        </div>
+                        <div class="card-body">
+
+                            <!-- Feedback reference box (only shown when revising) -->
+                            <div class="ch-feedback-ref hidden" id="ch-feedback-ref-box">
+                                <strong><i class="fa-solid fa-circle-info"></i> Club President Feedback (Previous
+                                    Review)</strong>
+                                <span id="ch-feedback-ref-text"></span>
+                            </div>
+
+                            <!-- Event Details -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4>Event Details</h4>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="ch-f-title">Event Title</label>
+                                <input type="text" id="ch-f-title" class="form-input"
+                                    placeholder="e.g. Annual Coding Marathon">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="ch-f-desc">Event Description</label>
+                                <textarea id="ch-f-desc" class="form-input textarea-small"
+                                    placeholder="Briefly describe the event, its purpose and activities..."></textarea>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="ch-f-date">Proposed Date</label>
+                                    <input type="date" id="ch-f-date" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="ch-f-participants">Expected / Restricted
+                                        Attendees</label>
+                                    <input type="number" min="1" id="ch-f-participants" class="form-input"
+                                        placeholder="e.g. 150">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="ch-f-time-start">Start Time</label>
+                                    <input type="time" id="ch-f-time-start" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="ch-f-time-end">End Time</label>
+                                    <input type="time" id="ch-f-time-end" class="form-input">
+                                </div>
+                            </div>
+
+                            <!-- AI Proposal Assistant -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4><i class="fa-solid fa-wand-magic-sparkles text-indigo"></i> AI Proposal Assistant</h4>
+                            </div>
+                            <div class="form-group mb-3">
+                                <div style="display:flex; align-items:flex-start; gap:0.75rem; flex-wrap:wrap;">
+                                    <button type="button" class="btn btn-primary" id="btn-ch-ai-assist">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate with AI
+                                    </button>
+                                    <p class="text-muted" style="font-size:0.75rem; margin:0.4rem 0 0;">
+                                        Fill in the event title, a one-line objective in the description, and expected
+                                        attendees above — the AI drafts a full description, budget and inventory plan
+                                        you can then refine.
+                                    </p>
+                                </div>
+                                <div id="ch-ai-assist-status" class="hidden" style="margin-top:0.85rem;"></div>
+                            </div>
+
+                            <!-- 1. Venue Booking Request -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4>1. Venue Booking Request</h4>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label" for="ch-f-venue-requirements">
+                                    Ask AI: What does this venue need to have?
+                                </label>
+                                <textarea id="ch-f-venue-requirements" class="form-input" rows="2"
+                                    placeholder="e.g. Projector, AC, seating for 400, a stage for a live performance..."></textarea>
+                                <p class="text-muted" style="font-size: 0.72rem; margin-top: 0.15rem;">
+                                    Matched against each venue's facilities on file with the Faculty Coordinator.
+                                </p>
+                            </div>
+                            <div class="form-grid mb-3">
+                                <div class="form-group">
+                                    <label class="form-label" for="ch-f-venue">Select Venue</label>
+                                    <div style="display:flex; gap:0.5rem; align-items:center;">
+                                        <select id="ch-f-venue" class="form-select" style="flex:1;">
+                                            <option value="">-- Select Venue --</option>
+                                        </select>
+                                    </div>
+                                    <p class="text-muted" id="ch-f-venue-meta"
+                                        style="font-size: 0.75rem; margin-top: 0.15rem;"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="ch-f-capacity">Capacity Required</label>
+                                    <input type="number" min="1" id="ch-f-capacity" class="form-input"
+                                        placeholder="e.g. 120">
+                                </div>
+                            </div>
+
+                            <!-- 2. Inventory Requirements -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4>2. Inventory &amp; Infrastructure Requirements (Lent Assets)</h4>
+                            </div>
+                            <div class="table-responsive mb-2">
+                                <table class="table table-compact" id="ch-f-inv-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 22%;">Category</th>
+                                            <th style="width: 34%;">Requirement</th>
+                                            <th style="width: 16%;">Quantity Asked</th>
+                                            <th style="width: 16%;">Units</th>
+                                            <th style="width: 8%;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ch-f-inv-tbody">
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="ch-add-row-btn" id="ch-f-inv-addrow">
+                                <i class="fa-solid fa-plus"></i> Add Item
+                            </button>
+
+                            <!-- 3. Procuring Items -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4>3. Procuring Items (Self-Procured Expenses)</h4>
+                            </div>
+                            <div class="table-responsive mb-2">
+                                <table class="table table-compact" id="ch-f-proc-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Requirement Name</th>
+                                            <th>Category</th>
+                                            <th>Quantity Asked</th>
+                                            <th>Units</th>
+                                            <th>Price per Unit</th>
+                                            <th>Total Price</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ch-f-proc-tbody">
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="ch-add-row-btn" id="ch-f-proc-addrow">
+                                <i class="fa-solid fa-plus"></i> Add Item
+                            </button>
+
+                            <!-- 4. Prize Money Request -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4>4. Prize Money Request</h4>
+                            </div>
+                            <div class="table-responsive mb-2">
+                                <table class="table table-compact" id="ch-f-prize-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 55%;">Position</th>
+                                            <th style="width: 35%;">Amount</th>
+                                            <th style="width: 10%;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ch-f-prize-tbody">
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="ch-add-row-btn" id="ch-f-prize-addrow">
+                                <i class="fa-solid fa-plus"></i> Add Position
+                            </button>
+
+                            <!-- 5. Judge / Guest Fee Request -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4>5. Judge / Guest Fee Request</h4>
+                            </div>
+                            <div class="table-responsive mb-2">
+                                <table class="table table-compact" id="ch-f-judge-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Number of Judges</th>
+                                            <th>Fee per Judge</th>
+                                            <th>Total Amount Requested</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ch-f-judge-tbody">
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="ch-add-row-btn" id="ch-f-judge-addrow">
+                                <i class="fa-solid fa-plus"></i> Add Judge / Guest
+                            </button>
+
+                            <!-- Comments if any -->
+                            <div class="form-group mt-3">
+                                <label for="ch-f-comments" class="form-label" style="font-weight: 700;">Comments if
+                                    any</label>
+                                <textarea id="ch-f-comments" class="form-input textarea-small"
+                                    placeholder="Add any additional notes or context for the Club President..."></textarea>
+                            </div>
+
+                            <!-- Budget Summary -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4>Budget Summary</h4>
+                            </div>
+                            <div class="proposal-summary-banner" id="ch-f-budget-summary"></div>
+
+                            <div class="proposal-decision-actions">
+                                <button class="btn btn-primary" id="btn-ch-send-approval">
+                                    <i class="fa-solid fa-paper-plane"></i> Send for Approval
+                                </button>
+                                <button class="btn btn-secondary" id="btn-ch-cancel">
+                                    <i class="fa-solid fa-xmark"></i> Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 3. READ-ONLY DETAIL VIEW ────────────────────────── -->
+                <div id="ch-detail-view" class="hidden">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.75rem;">
+                        <button class="btn btn-secondary" id="btn-ch-back-to-gallery">
+                            <i class="fa-solid fa-arrow-left"></i> Back to Gallery
+                        </button>
+                        <button class="btn btn-primary hidden" id="btn-ch-top-revise">
+                            <i class="fa-solid fa-arrows-rotate"></i> Revise &amp; Resubmit
+                        </button>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 id="ch-detail-title">Proposal</h3>
+                            <span class="badge badge-warning" id="ch-detail-status">Pending</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="proposal-meta-details">
+                                <div class="meta-desc-box">
+                                    <h5 class="setup-section-title">Event Description</h5>
+                                    <p id="ch-detail-desc" class="proposal-desc-text"></p>
+                                </div>
+                                <div class="proposal-details-grid-meta">
+                                    <div class="meta-stat-item">
+                                        <span class="lbl">Proposed Date &amp; Time</span>
+                                        <strong id="ch-detail-datetime">-</strong>
+                                    </div>
+                                    <div class="meta-stat-item">
+                                        <span class="lbl">Expected / Restricted Attendees</span>
+                                        <strong id="ch-detail-attendees">-</strong>
+                                    </div>
+                                    <div class="meta-stat-item">
+                                        <span class="lbl">Submitted On</span>
+                                        <strong id="ch-detail-submitted">-</strong>
+                                    </div>
+                                    <div class="meta-stat-item">
+                                        <span class="lbl">Venue Requested</span>
+                                        <strong id="ch-detail-venue">-</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="proposal-summary-banner" id="ch-detail-summary-banner"></div>
+
+                            <div class="proposal-resources-header mt-3">
+                                <h4>2. Inventory &amp; Infrastructure Requirements (Lent Assets)</h4>
+                            </div>
+                            <div class="table-responsive mb-3">
+                                <table class="table table-compact">
+                                    <thead>
+                                        <tr>
+                                            <th>Requirement Name</th>
+                                            <th>Category</th>
+                                            <th>Quantity Asked</th>
+                                            <th>Units</th>
+                                            <th>Decision</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ch-detail-inv-tbody"></tbody>
+                                </table>
+                            </div>
+
+                            <div class="proposal-resources-header mt-3">
+                                <h4>3. Procuring Items (Self-Procured Expenses)</h4>
+                            </div>
+                            <div class="table-responsive mb-3">
+                                <table class="table table-compact">
+                                    <thead>
+                                        <tr>
+                                            <th>Requirement Name &amp; Category</th>
+                                            <th>Quantity</th>
+                                            <th>Unit</th>
+                                            <th>Price per Unit</th>
+                                            <th>Total Price</th>
+                                            <th>Decision</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ch-detail-proc-tbody"></tbody>
+                                </table>
+                            </div>
+
+                            <div class="proposal-resources-header mt-3">
+                                <h4>4. Prize Money Request</h4>
+                            </div>
+                            <div class="table-responsive mb-3">
+                                <table class="table table-compact">
+                                    <thead>
+                                        <tr>
+                                            <th>Position</th>
+                                            <th>Amount</th>
+                                            <th>Decision</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ch-detail-prize-tbody"></tbody>
+                                </table>
+                            </div>
+
+                            <div class="proposal-resources-header mt-3">
+                                <h4>5. Judge / Guest Fee Request</h4>
+                            </div>
+                            <div class="table-responsive mb-3">
+                                <table class="table table-compact">
+                                    <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Number of Judges</th>
+                                            <th>Fee per Judge</th>
+                                            <th>Total Amount Requested</th>
+                                            <th>Decision</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ch-detail-judge-tbody"></tbody>
+                                </table>
+                            </div>
+
+                            <div class="ch-two-col-boxes">
+                                <div>
+                                    <span class="ch-box-label">Your Comments</span>
+                                    <div class="ch-readonly-box" id="ch-detail-your-comments">-</div>
+                                </div>
+                                <div>
+                                    <span class="ch-box-label">Club President Feedback</span>
+                                    <div class="ch-readonly-box" id="ch-detail-admin-feedback">-</div>
+                                </div>
+                            </div>
+
+                            <div class="proposal-decision-actions" id="ch-detail-actions">
+                                <button class="btn btn-primary hidden" id="btn-ch-revise-resubmit">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Revise &amp; Resubmit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ============================================================
+                 EVENT MANAGEMENT (Club Head) — approved events as cards,
+                 click into a 4-toggle detail workspace per event.
+            ============================================================= -->
+            <section id="tab-eventmgmt" class="tab-pane">
+
+                <!-- Gallery of approved events -->
+                <div id="ch-em-gallery-view">
+                    <div class="view-actions-bar">
+                        <div class="filters-row">
+                            <h3 class="section-title">Approved Events</h3>
+                        </div>
+                    </div>
+                    <div class="event-budget-cards" id="ch-em-grid">
+                        <!-- Dynamic event cards -->
+                    </div>
+                </div>
+
+                <!-- Event detail workspace (hidden until a card is opened) -->
+                <div id="ch-em-detail-view" class="hidden">
+                    <div class="view-actions-bar">
+                        <button class="btn btn-secondary btn-sm" id="btn-ch-em-back">
+                            <i class="fa-solid fa-arrow-left"></i> Back to Events
+                        </button>
+                    </div>
+
+                    <div class="dashboard-card card-full">
+                        <div class="card-header">
+                            <h3 id="ch-em-detail-title">Event Name</h3>
+                            <span class="badge badge-indigo" id="ch-em-detail-club-badge">Club</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="ch-em-toggle-row"
+                                style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1.25rem; border-bottom:1px solid var(--border-color); padding-bottom:1rem;">
+                                <button class="btn btn-secondary btn-sm ch-em-toggle-btn active" data-toggle="details">
+                                    <i class="fa-solid fa-circle-check"></i> Approved Details
+                                </button>
+                                <button class="btn btn-secondary btn-sm ch-em-toggle-btn" data-toggle="tasks">
+                                    <i class="fa-solid fa-list-check"></i> Task Allotment
+                                </button>
+                                <button class="btn btn-secondary btn-sm ch-em-toggle-btn" data-toggle="registrations">
+                                    <i class="fa-solid fa-address-card"></i> Registrations
+                                </button>
+                                <button class="btn btn-secondary btn-sm ch-em-toggle-btn" data-toggle="publish">
+                                    <i class="fa-solid fa-bullhorn"></i> Edit &amp; Publish
+                                </button>
+                            </div>
+
+                            <!-- Toggle: Approved Details -->
+                            <div class="ch-em-toggle-pane" id="ch-em-pane-details"></div>
+
+                            <!-- Toggle: Task Allotment -->
+                            <div class="ch-em-toggle-pane hidden" id="ch-em-pane-tasks"></div>
+
+                            <!-- Toggle: Registrations -->
+                            <div class="ch-em-toggle-pane hidden" id="ch-em-pane-registrations"></div>
+
+                            <!-- Toggle: Edit & Publish -->
+                            <div class="ch-em-toggle-pane hidden" id="ch-em-pane-publish"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 MANAGE MEMBERS (Club Head)
+            ============================================================= -->
+            <section id="tab-members" class="tab-pane">
+                <div class="view-actions-bar">
+                    <div class="filters-row">
+                        <h3 class="section-title">Club Members</h3>
+                        <span class="badge badge-warning" id="ch-members-pending-count" style="margin-left: 10px;">0
+                            Pending Requests</span>
+                    </div>
+                </div>
+
+                <h4
+                    style="margin: 1.5rem 0 1rem 0; color: var(--text-main); font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">
+                    <i class="fa-solid fa-user-clock text-warning"></i> Pending Join Requests</h4>
+                <div class="table-responsive mb-3">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Student ID</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Year</th>
+                                <th>Applied On</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ch-members-pending-tbody">
+                            <!-- Dynamic pending join requests -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4
+                    style="margin: 2rem 0 1rem 0; color: var(--text-main); font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">
+                    <i class="fa-solid fa-users text-success"></i> Active Club Members</h4>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Student ID</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Year</th>
+                                <th>Joined On</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ch-members-active-tbody">
+                            <!-- Dynamic active members -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 VOLUNTEER MANAGEMENT (Club Head)
+            ============================================================= -->
+            <section id="tab-volunteers" class="tab-pane">
+                <div class="view-actions-bar">
+                    <div class="filters-row">
+                        <h3 class="section-title">Recruitment Domains</h3>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="btn-ch-add-domain">
+                        <i class="fa-solid fa-plus"></i> Add Domain
+                    </button>
+                </div>
+                <div class="domain-cards-grid" id="ch-domains-grid">
+                    <!-- Dynamic domain cards -->
+                </div>
+
+                <h4
+                    style="margin: 2rem 0 1rem 0; color: var(--text-main); font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">
+                    <i class="fa-solid fa-file-signature text-indigo"></i> Volunteer Applications</h4>
+                <div class="table-responsive mb-3">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Applicant</th>
+                                <th>Student ID</th>
+                                <th>Domain</th>
+                                <th>Applied On</th>
+                                <th>Note</th>
+                                <th>Status</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ch-volunteer-apps-tbody">
+                            <!-- Dynamic volunteer applications -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4
+                    style="margin: 2rem 0 1rem 0; color: var(--text-main); font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">
+                    <i class="fa-solid fa-id-card-clip text-emerald"></i> Volunteer Details by Domain</h4>
+                <div class="domain-cards-grid" id="ch-domain-volunteers-grid">
+                    <!-- Dynamic volunteer lists per domain -->
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 CLUB FINANCES & EVENT BUDGETS (Club Head — read-only, scoped
+                 to this club only. Re-uses the President portal's exact
+                 club-detail / event-split-up markup & styling.)
+            ============================================================= -->
+            <section id="tab-finances" class="tab-pane">
+
+                <div class="view-actions-bar">
+                    <div class="filters-row">
+                        <h3 class="section-title">Club Budget Overview</h3>
+                    </div>
+                </div>
+
+                <div class="dashboard-card card-full" id="ch-finance-header-card">
+                    <div class="card-header">
+                        <h3 id="ch-finance-club-name">Club Name</h3>
+                        <span class="badge badge-info" id="ch-finance-club-category">Category</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="proposal-summary-banner" id="ch-finance-stats-banner"
+                            style="grid-template-columns: repeat(3, 1fr);">
+                            <!-- Allotted / Spent / Remaining dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="budget-split-layout" style="margin-top: 1.5rem; align-items: start;">
+                    <!-- LEFT: Approved Event Budgets List -->
+                    <div>
+                        <h4 class="section-subtitle" style="margin: 0 0 1rem 0; font-weight: 700; color: var(--text-main);">
+                            <i class="fa-solid fa-file-invoice-dollar text-indigo"></i> Approved Event Budgets</h4>
+                        <div class="event-budget-cards" id="ch-finance-event-grid">
+                            <!-- Dynamic event budget cards, scoped to this club only -->
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: Event Split-up Breakdown Details -->
+                    <div>
+                        <div class="dashboard-card" id="ch-finance-split-placeholder">
+                            <div class="card-body">
+                                <div class="placeholder-container">
+                                    <i class="fa-solid fa-chart-pie placeholder-icon"></i>
+                                    <p>Select an event on the left to view its budget allocation split-up and logged
+                                        expenses.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card hidden" id="ch-finance-split-details">
+                            <div class="card-header">
+                                <h3 id="ch-split-event-title">Event Budget Split-Up</h3>
+                                <div style="display:flex; gap:0.5rem; align-items:center;">
+                                    <span class="badge badge-secondary" id="ch-split-event-status-badge">Open</span>
+                                    <span class="badge badge-indigo" id="ch-split-event-badge">Select Event</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="split-visuals-grid">
+                                    <div class="split-pie-container">
+                                        <svg width="200" height="200" viewBox="0 0 42 42" class="donut-chart"
+                                            id="ch-split-donut-svg">
+                                            <circle class="donut-hole" cx="21" cy="21" r="15.915" fill="var(--bg-card)">
+                                            </circle>
+                                            <circle class="donut-ring" cx="21" cy="21" r="15.915" fill="transparent"
+                                                stroke="var(--border-color)" stroke-width="3"></circle>
+                                            <g id="ch-donut-segments-group"></g>
+                                        </svg>
+                                        <div class="donut-center-text">
+                                            <span class="donut-val" id="ch-donut-total-amt">₹0</span>
+                                            <span class="donut-lbl">Budget</span>
+                                        </div>
+                                    </div>
+                                    <div class="split-stats-legend" id="ch-split-legend-list">
+                                        <!-- Dynamic legend categories -->
+                                    </div>
+                                </div>
+
+                                <div class="budget-totals-row">
+                                    <div class="budget-total-box">
+                                        <span class="box-label">Allotted Budget</span>
+                                        <span class="box-val" id="ch-split-allotted-val">₹0.00</span>
+                                    </div>
+                                    <div class="budget-total-box">
+                                        <span class="box-label">Approved Expense Total</span>
+                                        <span class="box-val text-indigo" id="ch-split-spent-val">₹0.00</span>
+                                    </div>
+                                    <div class="budget-total-box">
+                                        <span class="box-label">Remaining Balance</span>
+                                        <span class="box-val text-emerald" id="ch-split-remaining-val">₹0.00</span>
+                                    </div>
+                                </div>
+
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin: -0.5rem 0 1rem 0;">
+                                    If an approved amount was not spent, leave the amount as <strong>0</strong> or
+                                    blank — no bill or detail upload is required for that line item.
+                                </p>
+
+                                <div class="expense-items-header">
+                                    <h4><i class="fa-solid fa-receipt text-indigo"></i> Self-Procured Expense Bills
+                                    </h4>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-compact">
+                                        <thead>
+                                            <tr>
+                                                <th>Item Name</th>
+                                                <th>Item Category</th>
+                                                <th>Approved Amount</th>
+                                                <th>Bill Amount</th>
+                                                <th>Bill Uploaded</th>
+                                                <th>Status</th>
+                                                <th class="text-right">Review Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ch-split-selfproc-tbody">
+                                            <!-- Dynamic self-procured expense rows, this event only -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="expense-items-header" style="margin-top: 1.5rem;">
+                                    <h4><i class="fa-solid fa-trophy text-indigo"></i> Prize Money Details</h4>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-compact">
+                                        <thead>
+                                            <tr>
+                                                <th>Item Name</th>
+                                                <th>Approved Amount</th>
+                                                <th>Amount Given</th>
+                                                <th>Student Details</th>
+                                                <th>Status</th>
+                                                <th class="text-right">Review Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ch-split-prize-tbody">
+                                            <!-- Dynamic prize money rows, this event only -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="expense-items-header" style="margin-top: 1.5rem;">
+                                    <h4><i class="fa-solid fa-gavel text-indigo"></i> Judge / Guest Fee Details</h4>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-compact">
+                                        <thead>
+                                            <tr>
+                                                <th>Item Name</th>
+                                                <th>Approved Amount</th>
+                                                <th>Amount Paid</th>
+                                                <th>Judge / Guest Details</th>
+                                                <th>Status</th>
+                                                <th class="text-right">Review Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ch-split-judge-tbody">
+                                            <!-- Dynamic judge/guest fee rows, this event only -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="expense-items-header" style="margin-top: 1.5rem;">
+                                    <h4>Comment</h4>
+                                </div>
+                                <p style="font-size: 0.8rem; color: var(--text-muted); margin: -0.4rem 0 0.6rem 0;">
+                                    One overall comment about this event's bills — sent to the Club President and
+                                    Faculty Coordinator along with the expenses below.
+                                </p>
+                                <textarea id="ch-split-bill-comment" class="form-control" rows="3"
+                                    placeholder="e.g. All bills verified against original receipts; catering bill delayed due to vendor invoicing."></textarea>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.6rem 0 0;">
+                                    Bills and details you fill in above are saved as drafts you can keep editing —
+                                    nothing is sent until you click <strong>Send for Processing</strong>. This
+                                    forwards the event's expenses to the Club President for first-level approval,
+                                    then to the Faculty Coordinator for final approval.
+                                </p>
+                                <div style="display:flex; justify-content:flex-end; align-items:center; gap:0.75rem; margin-top:0.6rem;">
+                                    <span class="text-muted" id="ch-send-for-processing-status" style="font-size:0.75rem;"></span>
+                                    <button class="btn btn-primary btn-sm" id="btn-ch-send-for-processing">
+                                        <i class="fa-solid fa-paper-plane"></i> Send for Processing
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 VOLUNTEER CHAT — one thread per selected volunteer for this club
+            ============================================================= -->
+            <section id="tab-volunteerchat" class="tab-pane">
+                <div class="dashboard-card card-full" style="display:flex; height:65vh; overflow:hidden; padding:0;">
+                    <div id="ch-chat-volunteer-list" style="width:260px; flex-shrink:0; border-right:1px solid var(--border-color); overflow-y:auto; padding:0.5rem;"></div>
+                    <div id="ch-chat-panel" style="flex:1; display:flex; flex-direction:column; overflow:hidden;"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Shared searchable-select dropdown (single instance, positioned fixed so it's never
+         clipped by the table's overflow-x:auto scroll container) -->
+    <div class="ch-dropdown-list hidden" id="ch-shared-dropdown"></div>
+
+    <!-- Shared units suggestions -->
+    <datalist id="ch-units-list">
+        <option value="units"></option>
+        <option value="pcs"></option>
+        <option value="sets"></option>
+        <option value="kits"></option>
+        <option value="boards"></option>
+        <option value="lights"></option>
+        <option value="mics"></option>
+        <option value="chairs"></option>
+        <option value="tables"></option>
+        <option value="packets"></option>
+        <option value="boxes"></option>
+        <option value="meters"></option>
+        <option value="litres"></option>
+        <option value="reams"></option>
+    </datalist>
+
+    <!-- MODAL: UPLOAD BILL FOR APPROVED EVENT BUDGET LINE ITEM -->
+    <div class="modal-overlay" id="modal-ch-upload-bill">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="ch-upload-bill-modal-title">Upload Bill for Approved Item</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-ch-upload-bill">
+                    <input type="hidden" id="ch-upload-bill-expense-id">
+                    <div class="form-group">
+                        <label class="form-label">Item</label>
+                        <input type="text" id="ch-upload-bill-item-display" class="form-input" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Approved Amount</label>
+                        <input type="text" id="ch-upload-bill-approved-display" class="form-input" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="ch-upload-bill-amount" class="form-label">Bill Amount (₹)</label>
+                        <input type="number" id="ch-upload-bill-amount" class="form-input" min="0"
+                            placeholder="4800">
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin: -0.4rem 0 0.6rem 0;">
+                        Leave as 0 or blank if this item was not procured — no bill upload needed.
+                    </p>
+                    <div class="form-group" id="ch-upload-bill-file-group">
+                        <label for="ch-upload-bill-file" class="form-label">Upload Bill</label>
+                        <input type="file" id="ch-upload-bill-file" class="form-input" accept="image/*,.pdf">
+                        <p id="ch-upload-bill-file-hint" style="font-size: 0.72rem; color: var(--text-muted); margin: 0.35rem 0 0;"></p>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Bill</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PRIZE MONEY DETAILS (Club Head — no bill; student payout details instead) -->
+    <div class="modal-overlay" id="modal-ch-prize-details">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="ch-prize-details-modal-title">Enter Prize Money Details</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-ch-prize-details">
+                    <input type="hidden" id="ch-prize-expense-id">
+                    <div class="form-group">
+                        <label class="form-label">Item</label>
+                        <input type="text" id="ch-prize-item-display" class="form-input" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Approved Amount</label>
+                        <input type="text" id="ch-prize-approved-display" class="form-input" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="ch-prize-amount" class="form-label">Amount Given (₹)</label>
+                        <input type="number" id="ch-prize-amount" class="form-input" min="0" placeholder="5000">
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin: -0.4rem 0 0.6rem 0;">
+                        Leave as 0 or blank if this prize was not given out — no student details needed.
+                    </p>
+                    <div id="ch-prize-detail-fields">
+                        <div class="form-group">
+                            <label for="ch-prize-student-name" class="form-label">Student Name</label>
+                            <input type="text" id="ch-prize-student-name" class="form-input"
+                                placeholder="e.g. Rohan Mehta">
+                        </div>
+                        <div class="form-group">
+                            <label for="ch-prize-student-id" class="form-label">Roll No</label>
+                            <input type="text" id="ch-prize-student-id" class="form-input"
+                                placeholder="e.g. 21f1000123">
+                        </div>
+                        <div class="form-group">
+                            <label for="ch-prize-department" class="form-label">Department</label>
+                            <input type="text" id="ch-prize-department" class="form-input"
+                                placeholder="e.g. Computer Science">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Intra-College or Inter-College</label>
+                            <div style="display:flex; gap:1.25rem; margin-top:0.35rem;">
+                                <label style="display:flex; align-items:center; gap:0.35rem; font-weight:400;">
+                                    <input type="radio" name="ch-prize-affiliation" value="Intra-College" checked>
+                                    Intra-College
+                                </label>
+                                <label style="display:flex; align-items:center; gap:0.35rem; font-weight:400;">
+                                    <input type="radio" name="ch-prize-affiliation" value="Inter-College">
+                                    Inter-College
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ch-prize-bank-details" class="form-label">Bank Details</label>
+                            <textarea id="ch-prize-bank-details" class="form-control" rows="2"
+                                placeholder="Account holder name, account number, IFSC code"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Details</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: JUDGE / GUEST FEE DETAILS (Club Head — no bill; judge payout details instead) -->
+    <div class="modal-overlay" id="modal-ch-judge-details">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="ch-judge-details-modal-title">Enter Judge / Guest Fee Details</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-ch-judge-details">
+                    <input type="hidden" id="ch-judge-expense-id">
+                    <div class="form-group">
+                        <label class="form-label">Item</label>
+                        <input type="text" id="ch-judge-item-display" class="form-input" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Approved Amount</label>
+                        <input type="text" id="ch-judge-approved-display" class="form-input" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="ch-judge-amount" class="form-label">Amount Paid (₹)</label>
+                        <input type="number" id="ch-judge-amount" class="form-input" min="0" placeholder="3000">
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin: -0.4rem 0 0.6rem 0;">
+                        Leave as 0 or blank if this fee was not paid out — no judge/guest details needed.
+                    </p>
+                    <div id="ch-judge-detail-fields">
+                        <div class="form-group">
+                            <label for="ch-judge-name" class="form-label">Judge / Guest Name</label>
+                            <input type="text" id="ch-judge-name" class="form-input" placeholder="e.g. Dr. Anita Rao">
+                        </div>
+                        <div class="form-group">
+                            <label for="ch-judge-contact" class="form-label">Contact Number</label>
+                            <input type="text" id="ch-judge-contact" class="form-input" placeholder="e.g. 98765 43210">
+                        </div>
+                        <div class="form-group">
+                            <label for="ch-judge-bank-details" class="form-label">Bank Details</label>
+                            <textarea id="ch-judge-bank-details" class="form-control" rows="2"
+                                placeholder="Account holder name, account number, IFSC code"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Details</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / ALLOT A TASK FOR AN EVENT -->
+    <div class="modal-overlay" id="modal-ch-add-task">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="ch-add-task-modal-title">Allot a Task</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-ch-add-task">
+                    <input type="hidden" id="ch-task-type">
+                    <input type="hidden" id="ch-task-procurement-usage-id">
+                    <div class="form-group">
+                        <label class="form-label">Task Title</label>
+                        <input type="text" id="ch-task-title" class="form-input" required placeholder="e.g. Poster Design">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea id="ch-task-description" class="form-input" rows="2" placeholder="What needs to be done"></textarea>
+                    </div>
+                    <div class="form-group" id="ch-task-procurement-item-group" style="display:none;">
+                        <label class="form-label">Procurement Item</label>
+                        <select id="ch-task-procurement-item" class="form-input"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Assign Volunteer</label>
+                        <select id="ch-task-volunteer" class="form-input" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Deadline</label>
+                        <input type="date" id="ch-task-deadline" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <select id="ch-task-priority" class="form-input">
+                            <option value="Low">Low</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Allot Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD RECRUITMENT DOMAIN -->
+    <div class="modal-overlay" id="modal-ch-add-domain">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add Recruitment Domain</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-ch-add-domain">
+                    <div class="form-group">
+                        <label class="form-label">Domain Name</label>
+                        <input type="text" id="ch-domain-name" class="form-input" required placeholder="e.g. Domain 6">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Domain Title</label>
+                        <input type="text" id="ch-domain-title" class="form-input" required placeholder="e.g. Social Media & Content">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Roles / Responsibilities (one per line)</label>
+                        <textarea id="ch-domain-roles" class="form-input" rows="4" required placeholder="Manage the club's Instagram page&#10;Write event recap captions&#10;Coordinate with the design domain for creatives"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Domain</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: VIEW A REGISTRANT'S QR CODE -->
+    <div class="modal-overlay" id="modal-ch-view-qr">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Registration QR Code</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align:center;">
+                <p id="ch-view-qr-name" style="font-weight:600; margin-bottom:0.75rem;"></p>
+                <canvas id="ch-view-qr-canvas" width="220" height="220" style="margin:0 auto;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ATTENDANCE QR SCANNER -->
+    <div class="modal-overlay" id="modal-ch-qr-scanner">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Attendance QR Scanner</h3>
+                <button class="btn-close modal-close-btn" id="btn-ch-qr-scanner-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.8rem; color:var(--text-muted);">Point a registrant's QR code at the camera. If
+                    the camera isn't available, enter their Registration ID manually below.</p>
+                <video id="ch-qr-video" style="width:100%; border-radius:8px; background:#000;" playsinline
+                    muted></video>
+                <canvas id="ch-qr-canvas" style="display:none;"></canvas>
+                <p id="ch-qr-scan-status" style="font-size:0.8rem; margin-top:0.5rem;"></p>
+                <div id="ch-qr-attendance-stats" class="hidden" style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:0.75rem;"></div>
+                <div class="form-group" style="margin-top:0.75rem;">
+                    <label class="form-label">Manual Entry (Registration ID)</label>
+                    <div style="display:flex; gap:0.5rem;">
+                        <input type="text" id="ch-qr-manual-input" class="form-input" placeholder="e.g. reg-1">
+                        <button type="button" class="btn btn-secondary" id="btn-ch-qr-manual-submit">Mark
+                            Present</button>
+                    </div>
+                </div>
+                <h4 style="margin-top:1.25rem;">Attendance History</h4>
+                <div class="table-responsive">
+                    <table class="table table-compact">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Student ID</th>
+                                <th>Checked In At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ch-qr-attendance-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CHANGE PASSWORD (self-service, all roles) -->
+    <div class="modal-overlay" id="modal-change-password">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Change Password</h3>
+                <button type="button" class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-change-password">
+                    <div class="form-group">
+                        <label for="change-current-password" class="form-label">Current Password</label>
+                        <input type="password" id="change-current-password" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="change-new-password" class="form-label">New Password</label>
+                        <input type="password" id="change-new-password" class="form-input" minlength="6" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="change-confirm-password" class="form-label">Confirm New Password</label>
+                        <input type="password" id="change-confirm-password" class="form-input" minlength="6" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR generation / decoding (CDN, same pattern as FontAwesome above) -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
+    <!-- Shared utility helpers (toast, date/time/currency formatting) -->
+    <script src="../shared/js/utils.js?v=1787505628"></script>
+    <!-- Backend API client -->
+    <script src="../shared/js/api-config.js?v=1787505628"></script>
+    <script src="../shared/js/api.js?v=1787505628"></script>
+    <!-- Role session guard -->
+    <script src="../shared/js/session.js?v=1787505628"></script>
+    <script>
+        const __session = requireRole("clubhead");
+        wireLogout();
+    </script>
+    <!-- Shared state schema/seed + load/save (all 4 dashboards) -->
+    <script src="../shared/js/seed-data.js?v=1787505628"></script>
+    <script src="../shared/js/state-core.js?v=1787505628"></script>
+    <script src="../shared/js/modal.js?v=1787505628"></script>
+    <script src="../shared/js/change-password.js?v=1787505628"></script>
+    <script src="../shared/js/budget-summary.js?v=1787505628"></script>
+    <!-- Club Head controller -->
+    <script src="app.js?v=1787505628"></script>
+</body>
+
+</html>

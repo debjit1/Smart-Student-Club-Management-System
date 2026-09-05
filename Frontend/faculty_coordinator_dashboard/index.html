@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Coordinator Portal - SSCMS</title>
+    <script>
+        // Computes a correct <base> from the actual URL instead of a hardcoded
+        // absolute path, so relative script/asset paths resolve whether this
+        // file is opened directly (file://) or through a static server that
+        // redirects "/index.html" to a clean URL without the filename.
+        (function () {
+            var href = window.location.href.split(/[?#]/)[0];
+            var dir = href.endsWith(".html") ? href.substring(0, href.lastIndexOf("/") + 1) : (href.endsWith("/") ? href : href + "/");
+            var base = document.createElement("base");
+            base.href = dir;
+            document.head.appendChild(base);
+        })();
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <div class="logo-icon">F</div>
+                <div class="logo-text">SSCMS <span class="badge-role">Faculty Coordinator</span></div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" data-tab="dashboard">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="overview">
+                        <i class="fa-solid fa-people-group"></i>
+                        <span>Club Overview</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="inventory">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                        <span>Inventory Manager</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="venues">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                        <span>Venues Manager</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="proposals">
+                        <i class="fa-solid fa-file-signature"></i>
+                        <span>Event Proposals</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="students">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Student Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="reports">
+                        <i class="fa-solid fa-file-circle-check"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="resources-calendar">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span>Resources Calendar</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-profile-card">
+                <div class="user-avatar" id="sidebar-avatar">FC</div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebar-username">Faculty Coordinator</div>
+                    <div class="user-role" id="sidebar-userrole">Faculty Coordinator</div>
+                </div>
+                <button type="button" class="profile-icon-btn" id="change-password-btn" title="Change Password">
+                    <i class="fa-solid fa-key"></i>
+                </button>
+                <a href="../index.html" class="logout-btn" title="Log out">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-wrapper">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-title-container">
+                    <h1 id="page-title">Faculty Coordinator Dashboard</h1>
+                    <p id="page-subtitle">Here is what's happening across campus clubs.</p>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="global-search" placeholder="Search inventory, venues, clubs...">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Toast Container -->
+            <div id="toast-container" class="toast-container"></div>
+
+            <!-- VIEW 1: DASHBOARD -->
+            <section id="tab-dashboard" class="tab-pane active">
+                <!-- Stats Counter Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-indigo-glow"><i class="fa-solid fa-money-bill-wave text-indigo"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Total Allocated Budget</span>
+                            <h2 class="stat-value" id="stat-total-budget">₹0.00</h2>
+                            <span class="stat-trend trend-neutral"><i class="fa-solid fa-circle-info"></i> All Clubs
+                                Combined</span>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="position: relative;">
+                        <button class="btn-edit-budget-pool" id="btn-edit-budget-pool" type="button"
+                            title="Edit master budget pool"
+                            style="position: absolute; top: 0.75rem; right: 0.75rem; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-muted); width: 30px; height: 30px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition);">
+                            <i class="fa-solid fa-pen" style="font-size: 0.75rem;"></i>
+                        </button>
+                        <div class="stat-icon bg-blue-glow"><i class="fa-solid fa-piggy-bank text-blue"></i></div>
+                        <div class="stat-content">
+                            <span class="stat-label">Available to Allocate</span>
+                            <h2 class="stat-value" id="stat-budget-pool-available">₹0.00</h2>
+                            <span class="stat-trend trend-neutral"><i class="fa-solid fa-circle-info"></i> of
+                                <span id="stat-budget-pool-total">₹0.00</span> master budget</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-emerald-glow"><i class="fa-solid fa-wallet text-emerald"></i></div>
+                        <div class="stat-content">
+                            <span class="stat-label">Total Budget Spent</span>
+                            <h2 class="stat-value" id="stat-spent-budget">₹0.00</h2>
+                            <span class="stat-trend trend-danger" id="stat-budget-percent">0% utilized</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-amber-glow"><i class="fa-solid fa-calendar-check text-amber"></i></div>
+                        <div class="stat-content">
+                            <span class="stat-label">Active Bookings</span>
+                            <h2 class="stat-value" id="stat-active-bookings">0</h2>
+                            <span class="stat-trend trend-success"><i class="fa-solid fa-circle-check"></i> Across all
+                                venues</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-blue-glow"><i class="fa-solid fa-truck-ramp-box text-blue"></i></div>
+                        <div class="stat-content">
+                            <span class="stat-label">Inventory Lent</span>
+                            <h2 class="stat-value" id="stat-inventory-lent">0</h2>
+                            <span class="stat-trend trend-info"><i class="fa-solid fa-clock"></i> Active usage
+                                logs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Content Grid -->
+                <div class="dashboard-grid">
+                    <!-- Left: Financial Overview & SVG Visuals -->
+                    <div class="dashboard-card card-large">
+                        <div class="card-header">
+                            <h3>Finance Utilization by Club</h3>
+                            <span class="badge badge-info">Semester Allocation</span>
+                        </div>
+                        <div class="card-body">
+                            <!-- Custom Chart Area -->
+                            <div class="chart-container">
+                                <div class="bar-chart" id="club-finance-chart">
+                                    <!-- Dynamic Bar Chart elements populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Venue Utilization Status -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Venue Status Summary</h3>
+                            <button class="btn btn-text text-indigo" id="view-all-venues-btn">View All</button>
+                        </div>
+                        <div class="card-body">
+                            <ul class="venue-quick-list" id="venue-quick-list">
+                                <!-- Dynamic status lines of venues -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Left: Recent Activity / Bookings -->
+                    <div class="dashboard-card card-large">
+                        <div class="card-header">
+                            <h3>Upcoming Venue Bookings</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Venue</th>
+                                            <th>Event</th>
+                                            <th>Club</th>
+                                            <th>Date & Time</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dashboard-bookings-tbody">
+                                        <!-- Dynamic bookings list -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Right: High-demand Inventory Items -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Inventory Alert</h3>
+                            <span class="badge badge-warning">Low Stock / High Demand</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="inventory-alerts-list" id="inventory-alerts-list">
+                                <!-- Dynamic inventory item status bars -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: CLUB OVERVIEW (Members & Volunteer Domains, read-only) -->
+            <section id="tab-overview" class="tab-pane">
+                <!-- LEVEL 1: CLUB GALLERY -->
+                <div id="overview-club-gallery-view">
+                    <div class="view-actions-bar">
+                        <div class="filters-row">
+                            <h3 class="section-title">Club Overview</h3>
+                        </div>
+                        <button class="btn btn-primary" id="btn-create-club">
+                            <i class="fa-solid fa-plus"></i> Create Club
+                        </button>
+                    </div>
+                    <div class="club-finance-cards-grid" id="overview-club-cards-grid">
+                        <!-- Dynamic club summary cards -->
+                    </div>
+                </div>
+
+                <!-- LEVEL 2: CLUB DETAIL -->
+                <div id="overview-club-detail-view" class="hidden">
+                    <div class="detail-header-actions" style="margin-bottom: 1.5rem;">
+                        <button class="btn btn-secondary btn-sm" id="btn-back-to-overview-clubs">
+                            <i class="fa-solid fa-arrow-left"></i> Back to Clubs
+                        </button>
+                    </div>
+
+                    <div class="dashboard-card card-full" id="overview-club-header-card">
+                        <div class="card-header">
+                            <h3 id="overview-club-name">Club Name</h3>
+                            <span class="badge badge-info" id="overview-club-category">Category</span>
+                        </div>
+                    </div>
+
+                    <!-- Sub-tab switch: Club Activities <-> Club Members <-> Certification Verification <-> Finances & Budgets -->
+                    <div class="filter-switch-container"
+                        style="display: flex; background: var(--bg-main); padding: 0.25rem; border-radius: var(--border-radius-md); border: 1px solid var(--border-color); max-width: 820px; margin: 1.5rem 0;">
+                        <button type="button" class="filter-switch-btn active" id="btn-overview-tab-activities"
+                            style="flex: 1; border: none; padding: 0.6rem; font-size: 0.85rem; font-weight: 600; border-radius: var(--border-radius-sm); cursor: pointer; transition: var(--transition);">
+                            <i class="fa-solid fa-chart-line"></i> Club Activities
+                        </button>
+                        <button type="button" class="filter-switch-btn" id="btn-overview-tab-members"
+                            style="flex: 1; border: none; padding: 0.6rem; font-size: 0.85rem; font-weight: 600; border-radius: var(--border-radius-sm); cursor: pointer; transition: var(--transition);">
+                            <i class="fa-solid fa-users"></i> Club Members
+                        </button>
+                        <button type="button" class="filter-switch-btn" id="btn-overview-tab-certification"
+                            style="flex: 1; border: none; padding: 0.6rem; font-size: 0.85rem; font-weight: 600; border-radius: var(--border-radius-sm); cursor: pointer; transition: var(--transition);">
+                            <i class="fa-solid fa-certificate"></i> Certification Verification
+                        </button>
+                        <button type="button" class="filter-switch-btn" id="btn-overview-tab-finances"
+                            style="flex: 1; border: none; padding: 0.6rem; font-size: 0.85rem; font-weight: 600; border-radius: var(--border-radius-sm); cursor: pointer; transition: var(--transition);">
+                            <i class="fa-solid fa-wallet"></i> Finances &amp; Budgets
+                        </button>
+                    </div>
+
+                    <!-- ===== CLUB ACTIVITIES PANE ===== -->
+                    <div id="overview-activities-pane">
+                        <div class="stats-grid" id="overview-activities-stats" style="margin-bottom: 1.5rem;">
+                            <!-- Dynamic stat cards: Events Conducted, Total Allotted, Total Expenses, Pending Proposals -->
+                        </div>
+
+                        <div class="dashboard-card card-full mb-4">
+                            <div class="card-header">
+                                <h3>Event Budget Utilization</h3>
+                                <span class="badge badge-info">Approved Events</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <div class="bar-chart" id="overview-activities-chart">
+                                        <!-- Dynamic bar chart, one bar per event -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="section-subtitle"
+                            style="margin: 1.5rem 0 1rem 0; font-weight: 700; color: var(--text-main);">
+                            <i class="fa-solid fa-calendar-check text-indigo"></i> Past &amp; Ongoing Events</h4>
+                        <div class="event-budget-cards" id="overview-activities-events-list">
+                            <!-- Dynamic event cards: description, date, budget, expenses, status -->
+                        </div>
+                    </div>
+
+                    <!-- ===== CLUB MEMBERS PANE ===== -->
+                    <div id="overview-members-pane" class="hidden">
+                        <h4 class="section-subtitle"
+                            style="margin: 1.5rem 0 1rem 0; font-weight: 700; color: var(--text-main);">
+                            <i class="fa-solid fa-users text-indigo"></i> Club Members</h4>
+
+                        <div class="dashboard-card card-full mb-3">
+                            <div class="card-header">
+                                <h3 style="font-size:0.95rem;">Pending Join Requests</h3>
+                                <span class="badge badge-warning" id="overview-members-pending-count">0 Pending</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Student ID</th>
+                                                <th>Email</th>
+                                                <th>Department</th>
+                                                <th>Year</th>
+                                                <th>Applied On</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="overview-members-pending-tbody">
+                                            <!-- Dynamic pending join requests -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card card-full mt-4">
+                            <div class="card-header">
+                                <h3 style="font-size:0.95rem;">Active Club Members</h3>
+                                <span class="text-muted" id="overview-members-active-count">0 members</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Student ID</th>
+                                                <th>Email</th>
+                                                <th>Department</th>
+                                                <th>Year</th>
+                                                <th>Joined On</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="overview-members-active-tbody">
+                                            <!-- Dynamic active members -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="section-subtitle"
+                            style="margin: 2rem 0 1rem 0; font-weight: 700; color: var(--text-main);">
+                            <i class="fa-solid fa-user-group text-indigo"></i> Recruitment Domains</h4>
+                        <div class="domain-cards-grid" id="overview-domains-grid">
+                            <!-- Dynamic 5 domain cards -->
+                        </div>
+
+                        <h4 class="section-subtitle"
+                            style="margin: 2rem 0 1rem 0; font-weight: 700; color: var(--text-main);">
+                            <i class="fa-solid fa-file-signature text-indigo"></i> Volunteer Applications</h4>
+                        <div class="dashboard-card card-full mb-3">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Applicant</th>
+                                                <th>Student ID</th>
+                                                <th>Domain</th>
+                                                <th>Applied On</th>
+                                                <th>Note</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="overview-volunteer-apps-tbody">
+                                            <!-- Dynamic volunteer applications -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="section-subtitle"
+                            style="margin: 2rem 0 1rem 0; font-weight: 700; color: var(--text-main);">
+                            <i class="fa-solid fa-id-card-clip text-indigo"></i> Volunteer Details by Domain</h4>
+                        <div class="domain-cards-grid" id="overview-domain-volunteers-grid">
+                            <!-- Dynamic volunteer lists per domain -->
+                        </div>
+                    </div>
+
+                    <!-- ===== CERTIFICATION VERIFICATION PANE ===== -->
+                    <div id="overview-certification-pane" class="hidden">
+                        <h4 class="section-subtitle"
+                            style="margin: 1.5rem 0 1rem 0; font-weight: 700; color: var(--text-main);">
+                            <i class="fa-solid fa-certificate text-indigo"></i> Certification Verification — All Events
+                            Conducted</h4>
+                        <div class="dashboard-card card-full mb-3">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Event Name</th>
+                                                <th>Date</th>
+                                                <th>Participants</th>
+                                                <th>Status</th>
+                                                <th class="text-right">Verification</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="overview-certification-tbody">
+                                            <!-- Dynamic certificate verification rows, one per event -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== FINANCES & BUDGETS PANE ===== -->
+                    <div id="overview-finances-pane" class="hidden">
+                        <div class="detail-header-actions"
+                            style="margin-bottom: 1.5rem; display:flex; justify-content:flex-end; gap: 1rem; flex-wrap: wrap;">
+                            <button class="btn btn-secondary btn-sm" id="btn-adjust-finances">
+                                <i class="fa-solid fa-money-bill-transfer"></i> Allocate / Disburse Funds
+                            </button>
+                            <button class="btn btn-primary btn-sm" id="btn-add-event-budget">
+                                <i class="fa-solid fa-circle-plus"></i> Allocate New Event Budget
+                            </button>
+                        </div>
+
+                        <div class="dashboard-card card-full" id="club-detail-header-card">
+                            <div class="card-body">
+                                <div class="proposal-summary-banner" id="club-finance-stats-banner"
+                                    style="grid-template-columns: repeat(3, 1fr);">
+                                    <!-- Club Allotted / Spent / Remaining dynamically populated -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="budget-split-layout" style="margin-top: 1.5rem; align-items: start;">
+                            <!-- LEFT: Approved Event Budgets List -->
+                            <div>
+                                <h4 class="section-subtitle" style="margin: 0 0 1rem 0; font-weight: 700; color: var(--text-main);">
+                                    <i class="fa-solid fa-file-invoice-dollar text-indigo"></i> Approved Event Budgets</h4>
+                                <div class="event-budget-cards" id="club-event-budgets-grid">
+                                    <!-- Dynamic event cards scoped to the active club -->
+                                </div>
+                            </div>
+
+                            <!-- RIGHT: Event Split-up Breakdown Details -->
+                            <div>
+                                <div class="dashboard-card" id="event-split-placeholder">
+                                    <div class="card-body">
+                                        <div class="placeholder-container">
+                                            <i class="fa-solid fa-chart-pie placeholder-icon"></i>
+                                            <p>Select an event on the left to view its budget allocation split-up and review
+                                                logged expenses &amp; bills.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="dashboard-card hidden" id="event-split-details-pane">
+                                    <div class="card-header">
+                                        <h3 id="split-event-title">Event Budget Split-Up</h3>
+                                        <div style="display:flex; gap:0.5rem; align-items:center;">
+                                            <span class="badge badge-secondary" id="split-event-status-badge">Open</span>
+                                            <span class="badge badge-emerald" id="split-event-badge">Select Event</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Visual Pie Split and stats -->
+                                        <div class="split-visuals-grid">
+                                            <div class="split-pie-container">
+                                                <!-- SVG Donut Chart representing budget split percentages -->
+                                                <svg width="200" height="200" viewBox="0 0 42 42" class="donut-chart"
+                                                    id="split-donut-svg">
+                                                    <circle class="donut-hole" cx="21" cy="21" r="15.915" fill="var(--bg-card)">
+                                                    </circle>
+                                                    <circle class="donut-ring" cx="21" cy="21" r="15.915" fill="transparent"
+                                                        stroke="var(--border-color)" stroke-width="3"></circle>
+                                                    <!-- Segments added dynamically in JS -->
+                                                    <g id="donut-segments-group"></g>
+                                                </svg>
+                                                <div class="donut-center-text">
+                                                    <span class="donut-val" id="donut-total-amt">₹0</span>
+                                                    <span class="donut-lbl">Budget</span>
+                                                </div>
+                                            </div>
+                                            <div class="split-stats-legend" id="split-legend-list">
+                                                <!-- Dynamic legend categories -->
+                                            </div>
+                                        </div>
+
+                                        <div class="budget-totals-row">
+                                            <div class="budget-total-box">
+                                                <span class="box-label">Allotted Budget</span>
+                                                <span class="box-val" id="split-allotted-val">₹0.00</span>
+                                            </div>
+                                            <div class="budget-total-box">
+                                                <span class="box-label">Approved Expense Total</span>
+                                                <span class="box-val text-indigo" id="split-spent-val">₹0.00</span>
+                                            </div>
+                                            <div class="budget-total-box">
+                                                <span class="box-label">Remaining Balance</span>
+                                                <span class="box-val text-emerald" id="split-remaining-val">₹0.00</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="expense-items-header">
+                                            <h4>Logged Expenses &amp; Bills</h4>
+                                            <button class="btn btn-secondary btn-sm" id="btn-add-expense-line">
+                                                <i class="fa-solid fa-plus"></i> Log Expense / Bill
+                                            </button>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-compact">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Item Name</th>
+                                                        <th>Type</th>
+                                                        <th>Item Category</th>
+                                                        <th>Approved Amount</th>
+                                                        <th>Bill Amount</th>
+                                                        <th>Bill / Details</th>
+                                                        <th>Status</th>
+                                                        <th class="text-right">Review Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="split-expenses-tbody">
+                                                    <!-- Dynamic expenses split for event -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="expense-items-header" style="margin-top: 1.25rem;">
+                                            <h4>Bill Comment (from Club Head)</h4>
+                                        </div>
+                                        <p id="split-bill-comment-box" class="dashboard-card" style="padding: 0.85rem 1rem; margin: 0; font-size: 0.85rem; color: var(--text-main); white-space: pre-wrap;">
+                                            No comment left yet.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Transaction Ledger — scoped to this club: real expenses & fund additions/disbursements/revisions only -->
+                        <div class="dashboard-card card-full mt-4">
+                            <div class="card-header">
+                                <h3>Financial Transactions Ledger</h3>
+                                <span class="badge badge-indigo">This Club's Movements</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Txn ID</th>
+                                                <th>Date & Time</th>
+                                                <th>Type</th>
+                                                <th>Amount</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="finance-ledger-tbody">
+                                            <!-- Dynamic transactions, this club only -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 2: INVENTORY MANAGER -->
+            <section id="tab-inventory" class="tab-pane">
+                <!-- 1. List View of Available Items -->
+                <div id="inventory-gallery-view">
+                    <div class="view-actions-bar">
+                        <div class="filters-row">
+                            <div class="filter-group">
+                                <label for="inventory-category-filter">Category</label>
+                                <select id="inventory-category-filter" class="form-select">
+                                    <option value="all">All Categories</option>
+                                    <option value="Venue & Infrastructure">Venue & Infrastructure</option>
+                                    <option value="Media & Technology">Media & Technology</option>
+                                    <option value="Materials & Consumables">Materials & Consumables</option>
+                                    <option value="Food & Hospitality">Food & Hospitality</option>
+                                    <option value="Services & Human Resources">Services & Human Resources</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="inventory-status-filter">Status</label>
+                                <select id="inventory-status-filter" class="form-select">
+                                    <option value="all">All Statuses</option>
+                                    <option value="In Stock">In Stock</option>
+                                    <option value="Out of Stock">Out of Stock</option>
+                                    <option value="Lent Out">Currently Lent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-outline" id="btn-bulk-inventory-csv">
+                                <i class="fa-solid fa-file-csv text-indigo"></i> Bulk Import CSV
+                            </button>
+                            <button class="btn btn-primary" id="btn-add-inventory-item">
+                                <i class="fa-solid fa-plus"></i> Add Inventory Item
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card card-full mt-3">
+                        <div class="card-header">
+                            <h3>Available Items &amp; Assets</h3>
+                            <span class="text-muted" id="inventory-count-summary">Showing 0 items</span>
+                        </div>
+                        <div class="card-body">
+                            <!-- Header Row to mimic table header look in a single line -->
+                            <div class="inventory-header-row"
+                                style="display: flex; padding: 0.5rem 1.25rem; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 2px solid var(--border-color); margin-bottom: 0.75rem; gap: 1rem;">
+                                <div style="flex: 1;">Item Code</div>
+                                <div style="flex: 2.2;">Item Name</div>
+                                <div style="flex: 1.8;">Category</div>
+                                <div style="flex: 2.6;">Stock Availability</div>
+                            </div>
+                            <div class="inventory-items-list" id="inventory-items-list"
+                                style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <!-- Dynamic items list rendered as inline rows -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Detailed View of Selected Item -->
+                <div id="inventory-detail-view" class="hidden">
+                    <div class="detail-header-actions" style="margin-bottom: 1.5rem;">
+                        <button class="btn btn-secondary btn-sm" id="btn-back-to-inventory">
+                            <i class="fa-solid fa-arrow-left"></i> Back to Available Items
+                        </button>
+                    </div>
+
+                    <div class="dashboard-card card-full" id="inventory-review-card">
+                        <div class="card-header"
+                            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+                            <div>
+                                <h3 id="review-inv-name">Item Name</h3>
+                                <p class="card-subtitle" id="review-inv-category">Category</p>
+                            </div>
+                            <span class="badge badge-success" id="review-inv-status">In Stock</span>
+                        </div>
+                        <div class="card-body">
+                            <!-- Stats Banner -->
+                            <div class="proposal-summary-banner" id="inventory-stats-banner"
+                                style="grid-template-columns: repeat(3, 1fr); margin-top: 1rem; margin-bottom: 1.5rem;">
+                                <!-- Code, Total Stock, Available Stock dynamically populated -->
+                            </div>
+
+                            <div class="proposal-decision-actions"
+                                style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; display: flex; gap: 1rem;">
+                                <button class="btn btn-primary" id="btn-edit-active-inv"
+                                    style="background-color: var(--primary);">
+                                    <i class="fa-solid fa-pen"></i> Edit Asset Details
+                                </button>
+                                <button class="btn btn-primary" id="btn-checkout-active-inv"
+                                    style="background-color: var(--secondary); border-color: var(--secondary);">
+                                    <i class="fa-solid fa-hand-holding-hand"></i> Checkout for Event
+                                </button>
+                                <button class="btn btn-secondary" id="btn-delete-active-inv"
+                                    style="border-color: var(--danger); color: var(--danger); background: transparent;">
+                                    <i class="fa-solid fa-trash"></i> Delete Asset
+                                </button>
+                            </div>
+
+                            <!-- Usage Tracker / Lending Logs List (read-only: allocation & booking is a Club President action) -->
+                            <div class="proposal-resources-header"
+                                style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                                <h4 style="margin: 0;">Active Inventory Allocations &amp; Usage Tracker</h4>
+                            </div>
+
+                            <!-- Header Row to mimic table header look in a single line -->
+                            <div class="usage-header-row"
+                                style="display: flex; padding: 0.5rem 1.25rem; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 2px solid var(--border-color); margin-bottom: 0.75rem; gap: 1rem;">
+                                <div style="flex: 2;">Item Name</div>
+                                <div style="flex: 1.5;">Club</div>
+                                <div style="flex: 1.8;">Location of Use</div>
+                                <div style="flex: 2.2;">Event Name</div>
+                                <div style="flex: 1; text-align: center;">Qty</div>
+                                <div style="flex: 2;">Booking Date &amp; Time</div>
+                                <div style="flex: 1.5; text-align: center;">Status</div>
+                            </div>
+                            <div class="inventory-usage-list" id="inventory-usage-list"
+                                style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <!-- Dynamic usage logs rendered as inline rows -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 3: VENUES MANAGER -->
+            <section id="tab-venues" class="tab-pane">
+                <div class="view-actions-bar">
+                    <div class="filters-row">
+                        <h3 class="section-title">Campus Venues</h3>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-outline" id="btn-bulk-venues-csv">
+                            <i class="fa-solid fa-file-csv text-indigo"></i> Bulk Import CSV
+                        </button>
+                        <button class="btn btn-primary" id="btn-add-venue">
+                            <i class="fa-solid fa-plus"></i> Add Venue
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Venues Cards Grid -->
+                <div class="venues-grid" id="venues-cards-grid">
+                    <!-- Dynamic Venue Cards containing description, existing items and onground options -->
+                </div>
+
+                <!-- Booking History Table (read-only: booking is a Club President action) -->
+                <div class="dashboard-card card-full mt-4">
+                    <div class="card-header">
+                        <h3>Venue Booking History &amp; Schedule Tracker</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Booking ID</th>
+                                        <th>Venue Name</th>
+                                        <th>Event Name</th>
+                                        <th>Booking Club</th>
+                                        <th>Booking Date</th>
+                                        <th>Time Slot</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="venue-bookings-tbody">
+                                    <!-- Dynamic list of bookings -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- VIEW 6: EVENT PROPOSALS -->
+            <section id="tab-proposals" class="tab-pane">
+                <!-- Gallery View Container (Shown by default) -->
+                <div id="proposals-gallery-view">
+                    <div class="view-actions-bar">
+                        <div class="filters-row">
+                            <h3 class="section-title">Event Proposals Review</h3>
+                            <span class="badge badge-warning" id="proposals-pending-count" style="margin-left: 10px;">0
+                                Pending</span>
+                        </div>
+                    </div>
+
+                    <h4
+                        style="margin: 1.5rem 0 1rem 0; color: var(--text-main); font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">
+                        <i class="fa-solid fa-clock text-warning"></i> Proposals for Review</h4>
+                    <div class="proposals-gallery-grid" id="proposals-gallery-grid" style="margin-bottom: 2.5rem;">
+                        <!-- Dynamic event cards will render here -->
+                    </div>
+
+                    <h4
+                        style="margin: 1.5rem 0 1rem 0; color: var(--text-main); font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">
+                        <i class="fa-solid fa-circle-check text-success"></i> Approved Events</h4>
+                    <div class="proposals-gallery-grid" id="proposals-approved-grid">
+                        <!-- Approved event cards will render here -->
+                    </div>
+                </div>
+
+                <!-- Detail View Container (Initially Hidden) -->
+                <div id="proposals-detail-view" class="hidden">
+                    <button class="btn btn-secondary mb-3" id="btn-back-to-gallery" style="margin-bottom: 1.5rem;">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Gallery
+                    </button>
+
+                    <div class="dashboard-card" id="proposal-review-card">
+                        <div class="card-header">
+                            <h3 id="review-prop-title">Proposal Review</h3>
+                            <span class="badge badge-warning" id="review-prop-status">Pending</span>
+                        </div>
+                        <div class="card-body">
+                            <!-- Context banner: only actionable once the President has reserved resources -->
+                            <div class="dashboard-card mb-3" id="proposal-faculty-context-banner"
+                                style="display:none; border-left: 4px solid var(--text-muted); background: var(--bg-main);">
+                                <div class="card-body" style="padding: 1rem 1.25rem;">
+                                    <p id="proposal-faculty-context-text" style="margin:0; font-size:0.9rem; color: var(--text-muted);"></p>
+                                </div>
+                            </div>
+
+                            <div class="proposal-meta-details">
+                                <div class="meta-desc-box">
+                                    <h5 class="setup-section-title">Event Description</h5>
+                                    <p id="review-prop-desc" class="proposal-desc-text"></p>
+                                </div>
+                                <div class="proposal-details-grid-meta">
+                                    <div class="meta-stat-item">
+                                        <span class="lbl">Organizer Club</span>
+                                        <strong id="review-prop-club">-</strong>
+                                    </div>
+                                    <div class="meta-stat-item">
+                                        <span class="lbl">Proposed Date &amp; Time</span>
+                                        <strong id="review-prop-datetime">-</strong>
+                                    </div>
+                                    <div class="meta-stat-item">
+                                        <span class="lbl">Expected / Restricted Attendees</span>
+                                        <strong id="review-prop-attendees">-</strong>
+                                    </div>
+                                    <div class="meta-stat-item">
+                                        <span class="lbl">Submitted On</span>
+                                        <strong id="review-prop-submitted">-</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 1. Venue Request Block -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4>1. Venue Booking Request</h4>
+                            </div>
+                            <div class="venue-inline-container mb-3" id="proposal-venue-container">
+                                <!-- Rendered dynamically inline -->
+                            </div>
+
+                            <!-- 2. Inventory Requirements Table -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4>2. Inventory &amp; Infrastructure Requirements (Lent Assets)</h4>
+                            </div>
+                            <div class="table-responsive mb-3">
+                                <table class="table table-compact" id="proposal-requirements-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Requirement Name</th>
+                                            <th>Quantity Asked</th>
+                                            <th>Units</th>
+                                            <th>Decision</th>
+                                            <th>Reason / Suggestions if any</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="proposal-requirements-tbody">
+                                        <!-- Dynamic inventory items -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- 3. Procuring Items Table -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4>3. Procuring Items (Self-Procured Expenses)</h4>
+                            </div>
+                            <div class="table-responsive mb-3">
+                                <table class="table table-compact" id="proposal-procuring-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Requirement Name &amp; Category</th>
+                                            <th>Quantity</th>
+                                            <th>Unit</th>
+                                            <th>Price per Unit</th>
+                                            <th>Overall Price</th>
+                                            <th>Decision</th>
+                                            <th>Reason / Suggestions if any</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="proposal-procuring-tbody">
+                                        <!-- Dynamic procuring items -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- 4. Prize Money Request Table -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4>4. Prize Money Request</h4>
+                            </div>
+                            <div class="table-responsive mb-3">
+                                <table class="table table-compact" id="proposal-prizes-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Positions</th>
+                                            <th>Amount</th>
+                                            <th>Decision</th>
+                                            <th>Reason / Suggestions if any</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="proposal-prizes-tbody">
+                                        <!-- Dynamic prize money entries -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- 5. Judge/Guest Fee Request Table -->
+                            <div class="proposal-resources-header mt-3">
+                                <h4>5. Judge / Guest Fee Request</h4>
+                            </div>
+                            <div class="table-responsive mb-3">
+                                <table class="table table-compact" id="proposal-judges-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Number of Judges</th>
+                                            <th>Fee per Judge</th>
+                                            <th>Total Amount Requested</th>
+                                            <th>Decision</th>
+                                            <th>Reason / Suggestions if any</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="proposal-judges-tbody">
+                                        <!-- Dynamic judge/guest fees entries -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Cost Summary Banner (Dynamic) -->
+                            <div class="proposal-summary-banner" id="proposal-summary-banner"></div>
+
+                            <!-- Budget Escalation panel — only shown when the President couldn't
+                                 approve directly because the club's remaining budget fell short -->
+                            <div class="card" id="fc-budget-escalation-panel" style="display:none; border: 1.5px solid var(--danger); margin-top: 1rem;">
+                                <div class="card-body">
+                                    <h4 style="color: var(--danger); margin-bottom: 0.75rem;"><i class="fa-solid fa-triangle-exclamation"></i> Needs Extra Budget</h4>
+                                    <div class="proposal-summary-banner" id="fc-escalation-stats-banner"></div>
+                                    <div class="form-group mt-2">
+                                        <label for="fc-topup-amount" class="form-label">Budget Top-Up Amount (₹) — allot at your discretion, need not match the shortfall</label>
+                                        <input type="number" min="0" id="fc-topup-amount" class="form-input" placeholder="e.g. 10000">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Feedback box for requesting changes back to the President -->
+                            <div class="form-group mt-3">
+                                <label for="proposal-feedback" class="form-label" style="font-weight: 700;">Feedback for
+                                    the President (required to request changes)</label>
+                                <textarea id="proposal-feedback" class="form-input textarea-small"
+                                    placeholder="Describe what needs to change before you can give final approval..."></textarea>
+                            </div>
+
+                            <div class="proposal-decision-actions">
+                                <button class="btn btn-primary" id="btn-approve-proposal"
+                                    style="background-color: var(--success); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);">
+                                    <i class="fa-solid fa-check-double"></i> Final Approve
+                                </button>
+                                <button class="btn btn-secondary" id="btn-revise-proposal"
+                                    style="border-color: var(--warning); color: var(--warning);">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Request Changes
+                                </button>
+                                <button class="btn btn-secondary" id="btn-reject-proposal"
+                                    style="border-color: var(--danger); color: var(--danger);">
+                                    <i class="fa-solid fa-xmark"></i> Reject Event
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 7: RESOURCES CALENDAR -->
+            <section id="tab-resources-calendar" class="tab-pane">
+                <div class="calendar-layout" style="display: flex; gap: 2rem; align-items: flex-start;">
+                    <!-- Filter Column -->
+                    <div class="calendar-sidebar-pane"
+                        style="width: 300px; flex-shrink: 0; background: var(--bg-card); border-radius: var(--border-radius-md); border: 1px solid var(--border-color); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+                        <h4
+                            style="margin-bottom: 1.25rem; font-size: 1.1rem; color: var(--text-main); font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-sliders text-indigo"></i> Calendar Filters
+                        </h4>
+
+                        <!-- Toggle Switch -->
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label class="form-label"
+                                style="font-weight: 600; margin-bottom: 0.5rem; display: block; font-size: 0.85rem; color: var(--text-muted);">Resource
+                                Type</label>
+                            <div class="filter-switch-container"
+                                style="display: flex; background: var(--bg-main); padding: 0.25rem; border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                                <button type="button" class="filter-switch-btn active" id="btn-calendar-venues"
+                                    style="flex: 1; border: none; padding: 0.6rem; font-size: 0.85rem; font-weight: 600; border-radius: var(--border-radius-sm); cursor: pointer; transition: var(--transition);">Venues</button>
+                                <button type="button" class="filter-switch-btn" id="btn-calendar-requirements"
+                                    style="flex: 1; border: none; padding: 0.6rem; font-size: 0.85rem; font-weight: 600; border-radius: var(--border-radius-sm); cursor: pointer; transition: var(--transition);">Requirements</button>
+                            </div>
+                        </div>
+
+                        <!-- Checkboxes List -->
+                        <div class="form-group">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                                <label id="calendar-filter-title" class="form-label"
+                                    style="font-weight: 600; font-size: 0.85rem; color: var(--text-muted); margin: 0;">Filter
+                                    Venues</label>
+                                <button type="button" id="btn-calendar-select-all" class="btn-text"
+                                    style="font-size: 0.75rem; color: var(--primary); font-weight: 600; border: none; background: none; cursor: pointer; padding: 0;">Select
+                                    All</button>
+                            </div>
+                            <div id="calendar-checkboxes-list" class="checkbox-list-scrollable"
+                                style="display: flex; flex-direction: column; gap: 0.65rem; max-height: 380px; overflow-y: auto; padding-right: 0.25rem;">
+                                <!-- Checkboxes populated dynamically by app.js -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calendar main area -->
+                    <div class="calendar-main-pane"
+                        style="flex-grow: 1; background: var(--bg-card); border-radius: var(--border-radius-md); border: 1px solid var(--border-color); padding: 1.5rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 1.5rem;">
+                        <!-- Navigation Row -->
+                        <div class="calendar-nav-row"
+                            style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3 id="calendar-month-title"
+                                style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0;">July
+                                2026</h3>
+                            <div class="calendar-nav-controls" style="display: flex; gap: 0.5rem; align-items: center;">
+                                <button type="button" class="btn btn-secondary btn-sm" id="calendar-nav-prev"
+                                    style="padding: 0.4rem 0.75rem;"><i class="fa-solid fa-chevron-left"></i></button>
+                                <button type="button" class="btn btn-secondary btn-sm" id="calendar-nav-today"
+                                    style="padding: 0.4rem 1rem; font-weight: 600;">Today</button>
+                                <button type="button" class="btn btn-secondary btn-sm" id="calendar-nav-next"
+                                    style="padding: 0.4rem 0.75rem;"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Calendar Layout Grid -->
+                        <div class="calendar-wrapper"
+                            style="border: 1px solid var(--border-color); border-radius: var(--border-radius-md); overflow: hidden; background: var(--border-color);">
+                            <!-- Weekdays Header -->
+                            <div class="calendar-weekdays"
+                                style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); background: var(--bg-main); border-bottom: 1px solid var(--border-color); padding: 0.75rem 0;">
+                                <div>Sun</div>
+                                <div>Mon</div>
+                                <div>Tue</div>
+                                <div>Wed</div>
+                                <div>Thu</div>
+                                <div>Fri</div>
+                                <div>Sat</div>
+                            </div>
+                            <!-- Days Grid -->
+                            <div class="calendar-days-grid" id="calendar-days-grid"
+                                style="display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: minmax(120px, auto); gap: 1px; background: var(--border-color);">
+                                <!-- Cells generated dynamically by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 8: STUDENT MANAGEMENT & ONBOARDING -->
+            <section id="tab-students" class="tab-pane">
+                <div style="margin-bottom: 1.5rem;">
+                    <div class="dashboard-card" style="padding: 1.25rem;">
+                        <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem;"><i class="fa-solid fa-file-csv text-indigo"></i> Bulk Student Onboarding (CSV Upload)</h4>
+                        <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 0.75rem;">Upload a CSV file with <code>student_id, name, department, year</code> columns. Each student's login is auto-generated as <code>&lt;student_id&gt;@iitm.in</code> with password <code>student@123</code>.</p>
+                        <div style="display: flex; gap: 0.75rem; align-items: center; max-width: 600px;">
+                            <input type="file" id="bulk-student-file-input" accept=".csv" class="form-control" style="font-size: 0.85rem;">
+                            <button class="btn btn-primary" id="btn-upload-bulk-students" style="padding: 0.5rem 1rem; font-size: 0.85rem; white-space: nowrap;"><i class="fa-solid fa-upload"></i> Import CSV</button>
+                        </div>
+                        <div id="bulk-student-import-report"></div>
+                    </div>
+                </div>
+
+                <div id="sm-view-root"></div>
+            </section>
+
+            <!-- VIEW: ANALYTICS REPORTS (generate / view / download) -->
+            <section id="tab-reports" class="tab-pane">
+                <div id="reports-root"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL 1: ADD / EDIT INVENTORY ITEM -->
+    <div class="modal-overlay" id="modal-inventory-item">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-inventory-title">Add Inventory Item</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-inventory-item">
+                    <input type="hidden" id="inv-item-id">
+                    <div class="form-group">
+                        <label for="inv-item-name" class="form-label">Item Name</label>
+                        <input type="text" id="inv-item-name" class="form-input" required
+                            placeholder="e.g. Cordless Mic">
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="inv-item-category" class="form-label">Category</label>
+                            <select id="inv-item-category" class="form-select" required>
+                                <option value="Venue & Infrastructure">Venue & Infrastructure</option>
+                                <option value="Media & Technology">Media & Technology</option>
+                                <option value="Materials & Consumables">Materials & Consumables</option>
+                                <option value="Food & Hospitality">Food & Hospitality</option>
+                                <option value="Services & Human Resources">Services & Human Resources</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="inv-item-code" class="form-label">Item Code</label>
+                            <input type="text" id="inv-item-code" class="form-input" required
+                                placeholder="e.g. AV-MIC-02">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="inv-item-qty" class="form-label">Total Stock Quantity</label>
+                            <input type="number" id="inv-item-qty" class="form-input" min="1" required placeholder="10">
+                        </div>
+                        <div class="form-group" style="display: none;">
+                            <label for="inv-item-location" class="form-label">Storage Location</label>
+                            <input type="text" id="inv-item-location" class="form-input" value="Central Storage">
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Asset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ADD / EDIT VENUE -->
+    <div class="modal-overlay" id="modal-venue-item">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-venue-title">Add Venue</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-venue-item">
+                    <input type="hidden" id="venue-item-id">
+                    <div class="form-group">
+                        <label for="venue-item-name" class="form-label">Venue Name</label>
+                        <input type="text" id="venue-item-name" class="form-input" required
+                            placeholder="e.g. Seminar Hall 3">
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="venue-item-capacity" class="form-label">Capacity</label>
+                            <input type="number" id="venue-item-capacity" class="form-input" min="1" required
+                                placeholder="120">
+                        </div>
+                        <div class="form-group">
+                            <label for="venue-item-location" class="form-label">Location</label>
+                            <input type="text" id="venue-item-location" class="form-input" required
+                                placeholder="e.g. Block B, Ground Floor">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="venue-item-description" class="form-label">Description</label>
+                        <textarea id="venue-item-description" class="form-input textarea-small" required
+                            placeholder="Short description of the space and typical use."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="venue-item-facilities" class="form-label">Facilities</label>
+                        <textarea id="venue-item-facilities" class="form-input textarea-small" required
+                            placeholder="e.g. Ceiling projector, Whiteboard, extension power boards."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="venue-item-requirements" class="form-label">On-Ground Setup Requirements</label>
+                        <input type="text" id="venue-item-requirements" class="form-input" required
+                            placeholder="Comma-separated, e.g. Ceiling Projector, Whiteboard, Extension Power Boards">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Venue</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: DISBURSE / ALLOCATE CLUB FUNDS -->
+    <div class="modal-overlay" id="modal-club-finances">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Disburse / Adjust Club Budget</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-club-finance">
+                    <div class="form-group">
+                        <label for="finance-club" class="form-label">Club</label>
+                        <select id="finance-club" class="form-select" required disabled>
+                            <!-- Locked to the club currently being viewed in Overview -->
+                        </select>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="finance-type" class="form-label">Allocation Type</label>
+                            <select id="finance-type" class="form-select" required>
+                                <option value="Allocation">Add Allocation (Grant)</option>
+                                <option value="Expense Reimbursement">Expense Reimbursement</option>
+                                <option value="Adjustment">Budget Revision (Decrease/Fine)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="finance-amount" class="form-label">Amount (₹)</label>
+                            <input type="number" id="finance-amount" class="form-input" min="1" required
+                                placeholder="5000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="finance-desc" class="form-label">Description / Reason</label>
+                        <textarea id="finance-desc" class="form-input textarea-small" required
+                            placeholder="e.g. Additional logistics fund grant for IoT Hackathon."></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Apply Fund Adjustment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 6: LOG EXPENSE / BILL LINE ITEM -->
+    <div class="modal-overlay" id="modal-expense-line">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Log Additional Expense / Bill</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-expense-line">
+                    <div class="form-group">
+                        <label for="expense-event-name-display" class="form-label">Event</label>
+                        <input type="text" id="expense-event-name-display" class="form-input" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-item-name" class="form-label">Item Name</label>
+                        <input type="text" id="expense-item-name" class="form-input" required
+                            placeholder="e.g. Printing of 20 color posters & flyers">
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="expense-type" class="form-label">Expense Type</label>
+                            <select id="expense-type" class="form-select" required>
+                                <option value="Self-Procured Expense">Self-Procured Expense</option>
+                                <option value="Prize Money">Prize Money</option>
+                                <option value="Judge/Guest Fee">Judge/Guest Fee</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="expense-category" class="form-label">Item Category</label>
+                            <select id="expense-category" class="form-select" required>
+                                <option value="Catering & Hospitality">Catering & Hospitality</option>
+                                <option value="Logistics & Venue Setup">Logistics & Venue Setup</option>
+                                <option value="Marketing & Printing">Marketing & Printing</option>
+                                <option value="Speakers / Honorarium">Speakers / Honorarium</option>
+                                <option value="Miscellaneous">Miscellaneous</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-amount" class="form-label">Bill Amount (₹)</label>
+                        <input type="number" id="expense-amount" class="form-input" min="1" required placeholder="1500">
+                    </div>
+                    <div class="form-group" id="expense-bill-upload-group">
+                        <label for="expense-bill-file" class="form-label">Upload Bill</label>
+                        <input type="file" id="expense-bill-file" class="form-input" accept="image/*,.pdf">
+                        <p class="text-muted" id="expense-bill-hint" style="font-size: 0.75rem; margin-top: 0.25rem;">
+                            Required unless the expense type is Prize Money.</p>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit for Review</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 7: CALENDAR VENUE BOOKING DETAILS -->
+    <div class="modal-overlay" id="modal-calendar-venue">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Venue Booking Details</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                    <div
+                        style="display: flex; align-items: center; gap: 0.75rem; background: var(--primary-light); padding: 1rem; border-radius: var(--border-radius-md); border: 1px solid rgba(2, 132, 199, 0.1);">
+                        <i class="fa-solid fa-location-dot text-primary" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h4 id="cal-venue-name" style="margin: 0; font-size: 1.1rem; color: var(--text-main);">Venue
+                                Name</h4>
+                            <span id="cal-venue-location" class="text-muted" style="font-size: 0.8rem;">Location</span>
+                        </div>
+                    </div>
+
+                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div
+                            style="background: var(--bg-main); padding: 0.85rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
+                            <span class="text-muted"
+                                style="font-size: 0.75rem; display: block; margin-bottom: 0.25rem; font-weight: 500;">BOOKED
+                                BY</span>
+                            <strong id="cal-venue-club" style="font-size: 0.9rem; color: var(--text-main);">-</strong>
+                        </div>
+                        <div
+                            style="background: var(--bg-main); padding: 0.85rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
+                            <span class="text-muted"
+                                style="font-size: 0.75rem; display: block; margin-bottom: 0.25rem; font-weight: 500;">EVENT</span>
+                            <strong id="cal-venue-event" style="font-size: 0.9rem; color: var(--text-main);">-</strong>
+                        </div>
+                    </div>
+
+                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div
+                            style="background: var(--bg-main); padding: 0.85rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
+                            <span class="text-muted"
+                                style="font-size: 0.75rem; display: block; margin-bottom: 0.25rem; font-weight: 500;">DATE</span>
+                            <strong id="cal-venue-date" style="font-size: 0.9rem; color: var(--text-main);">-</strong>
+                        </div>
+                        <div
+                            style="background: var(--bg-main); padding: 0.85rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
+                            <span class="text-muted"
+                                style="font-size: 0.75rem; display: block; margin-bottom: 0.25rem; font-weight: 500;">TIME
+                                SLOT</span>
+                            <strong id="cal-venue-time" style="font-size: 0.9rem; color: var(--text-main);">-</strong>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4
+                            style="font-size: 0.9rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-main);">
+                            Approved Venue Requirements</h4>
+                        <ul id="cal-venue-requirements"
+                            style="list-style-position: inside; display: flex; flex-direction: column; gap: 0.4rem; padding: 0.75rem 1rem; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); font-size: 0.85rem; color: var(--text-main);">
+                            <!-- Dynamically listed -->
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-actions" style="margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary modal-close-btn" style="width: 100%;">Close
+                        Details</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 8: CALENDAR REQUIREMENT BOOKING DETAILS -->
+    <div class="modal-overlay" id="modal-calendar-requirement">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Requirement Allocation Details</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-calendar-requirement">
+                    <input type="hidden" id="cal-req-log-id">
+                    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                        <div
+                            style="display: flex; align-items: center; gap: 0.75rem; background: var(--success-light); padding: 1rem; border-radius: var(--border-radius-md); border: 1px solid rgba(16, 185, 129, 0.1);">
+                            <i class="fa-solid fa-boxes-stacked text-success" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <h4 id="cal-req-name" style="margin: 0; font-size: 1.1rem; color: var(--text-main);">
+                                    Requirement Name</h4>
+                                <span class="badge badge-success" id="cal-req-qty"
+                                    style="font-size: 0.75rem; margin-top: 0.25rem; display: inline-block;">Qty:
+                                    0</span>
+                            </div>
+                        </div>
+
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div
+                                style="background: var(--bg-main); padding: 0.85rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
+                                <span class="text-muted"
+                                    style="font-size: 0.75rem; display: block; margin-bottom: 0.25rem; font-weight: 500;">CLUB
+                                    USING</span>
+                                <strong id="cal-req-club" style="font-size: 0.9rem; color: var(--text-main);">-</strong>
+                            </div>
+                            <div
+                                style="background: var(--bg-main); padding: 0.85rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
+                                <span class="text-muted"
+                                    style="font-size: 0.75rem; display: block; margin-bottom: 0.25rem; font-weight: 500;">EVENT
+                                    NAME</span>
+                                <strong id="cal-req-event"
+                                    style="font-size: 0.9rem; color: var(--text-main);">-</strong>
+                            </div>
+                        </div>
+
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div
+                                style="background: var(--bg-main); padding: 0.85rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
+                                <span class="text-muted"
+                                    style="font-size: 0.75rem; display: block; margin-bottom: 0.25rem; font-weight: 500;">DATE</span>
+                                <strong id="cal-req-date" style="font-size: 0.9rem; color: var(--text-main);">-</strong>
+                            </div>
+                            <div
+                                style="background: var(--bg-main); padding: 0.85rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
+                                <span class="text-muted"
+                                    style="font-size: 0.75rem; display: block; margin-bottom: 0.25rem; font-weight: 500;">TIMING</span>
+                                <strong id="cal-req-time" style="font-size: 0.9rem; color: var(--text-main);">-</strong>
+                            </div>
+                        </div>
+
+                        <!-- Assigned To field -->
+                        <div class="form-group">
+                            <label for="cal-req-assigned" class="form-label"
+                                style="font-weight: 700; color: var(--text-main); display: block; margin-bottom: 0.5rem;">Assigned
+                                To (Who will come and procure)</label>
+                            <input type="text" id="cal-req-assigned" class="form-input"
+                                placeholder="e.g. Rahul Kumar (Club Head)"
+                                style="font-size: 0.9rem; padding: 0.6rem 0.85rem; width: 100%;">
+                            <p class="text-muted" id="cal-req-assigned-note" style="font-size: 0.75rem; margin-top: 0.25rem;">This field can be
+                                updated by the Club Head or Domain Head to assign procurement duty.</p>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions" style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                        <button type="button" class="btn btn-secondary modal-close-btn" style="flex: 1;">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="btn-cal-req-save" style="flex: 1;">Save Assignment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 9: CREATE CLUB -->
+    <div class="modal-overlay" id="modal-create-club">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Create New Club</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-create-club">
+                    <div class="form-group">
+                        <label for="create-club-name" class="form-label">Club Name</label>
+                        <input type="text" id="create-club-name" class="form-input" required
+                            placeholder="e.g. Photography Club">
+                    </div>
+                    <div class="form-group">
+                        <label for="create-club-category" class="form-label">Category</label>
+                        <select id="create-club-category" class="form-select" required>
+                            <option value="Technical">Technical</option>
+                            <option value="Cultural">Cultural</option>
+                            <option value="Social">Social</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Literary">Literary</option>
+                            <option value="Miscellaneous">Miscellaneous</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="create-club-description" class="form-label">Description</label>
+                        <textarea id="create-club-description" class="form-input textarea-small"
+                            placeholder="Short description of the club's focus and activities."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="create-club-head-email" class="form-label">Club Head Email</label>
+                        <input type="email" id="create-club-head-email" class="form-input"
+                            placeholder="Leave blank to auto-generate, e.g. photographyclub@iitm.in">
+                    </div>
+                    <div class="form-group">
+                        <label for="create-club-head-password" class="form-label">Club Head Password</label>
+                        <input type="text" id="create-club-head-password" class="form-input" minlength="6"
+                            placeholder="Leave blank to auto-generate (min 6 characters)">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Club</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT CLUB (description + Club Head password reset) -->
+    <div class="modal-overlay" id="modal-edit-club">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Edit Club</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit-club">
+                    <input type="hidden" id="edit-club-id">
+                    <div class="form-group">
+                        <label class="form-label">Club Name</label>
+                        <input type="text" id="edit-club-name" class="form-input" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-club-description" class="form-label">Description</label>
+                        <textarea id="edit-club-description" class="form-input textarea-small"
+                            placeholder="Short description of the club's focus and activities."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-club-head-password" class="form-label">Reset Club Head Password</label>
+                        <input type="text" id="edit-club-head-password" class="form-input" minlength="6"
+                            placeholder="Leave blank to keep the current password">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ALLOCATE EVENT BUDGET -->
+    <div class="modal-overlay" id="modal-event-budget">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Allocate Event Budget</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-event-budget">
+                    <div class="form-group">
+                        <label for="evt-budget-name" class="form-label">Event Name</label>
+                        <input type="text" id="evt-budget-name" class="form-input" required
+                            placeholder="e.g. Hackathon 3.0">
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="evt-budget-club" class="form-label">Hosting Club</label>
+                            <select id="evt-budget-club" class="form-select" required disabled>
+                                <!-- Locked to the active club being viewed -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="evt-budget-allotted" class="form-label">Allotted Event Budget (₹)</label>
+                            <input type="number" id="evt-budget-allotted" class="form-input" min="1" required
+                                placeholder="15000">
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Allocate Event Budget</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 10: EDIT MASTER BUDGET POOL -->
+    <div class="modal-overlay" id="modal-budget-pool">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Edit Master Budget Pool</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-budget-pool">
+                    <div class="form-group">
+                        <label for="budget-pool-total" class="form-label">Total Master Budget (₹)</label>
+                        <input type="number" id="budget-pool-total" class="form-input" min="0" step="1" required
+                            placeholder="200000">
+                        <p class="text-muted" style="font-size: 0.75rem; margin-top: 0.35rem;">
+                            The "Available to Allocate" amount is this total minus everything already allotted to clubs.
+                        </p>
+                    </div>
+                    <div class="proposal-summary-banner" id="budget-pool-summary"
+                        style="grid-template-columns: repeat(2, 1fr); margin-bottom: 1rem;">
+                        <!-- Currently Allotted / Currently Available dynamically populated -->
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Budget Pool</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 11: BULK IMPORT VENUES CSV -->
+    <div class="modal-overlay" id="modal-bulk-venues-csv">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Bulk Import Venues (CSV)</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-bulk-venues-csv">
+                    <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 1rem;">
+                        Upload a CSV file formatted with headers: <code>name, capacity, location, facilities, requirements</code>.
+                    </p>
+                    <div class="form-group">
+                        <label for="bulk-venues-file-input" class="form-label">CSV File</label>
+                        <input type="file" id="bulk-venues-file-input" class="form-input" accept=".csv" required>
+                    </div>
+                    <div id="bulk-venues-report" style="margin-top: 1rem;"></div>
+                    <div class="modal-actions" style="margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Close</button>
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-upload"></i> Upload &amp; Import</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 12: BULK IMPORT INVENTORY CSV -->
+    <div class="modal-overlay" id="modal-bulk-inventory-csv">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Bulk Import Inventory Items (CSV)</h3>
+                <button class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-bulk-inventory-csv">
+                    <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 1rem;">
+                        Upload a CSV file formatted with headers: <code>code, name, category, total_stock, available_stock</code>.
+                    </p>
+                    <div class="form-group">
+                        <label for="bulk-inventory-file-input" class="form-label">CSV File</label>
+                        <input type="file" id="bulk-inventory-file-input" class="form-input" accept=".csv" required>
+                    </div>
+                    <div id="bulk-inventory-report" style="margin-top: 1rem;"></div>
+                    <div class="modal-actions" style="margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Close</button>
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-upload"></i> Upload &amp; Import</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CHANGE PASSWORD (self-service, all roles) -->
+    <div class="modal-overlay" id="modal-change-password">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Change Password</h3>
+                <button type="button" class="btn-close modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-change-password">
+                    <div class="form-group">
+                        <label for="change-current-password" class="form-label">Current Password</label>
+                        <input type="password" id="change-current-password" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="change-new-password" class="form-label">New Password</label>
+                        <input type="password" id="change-new-password" class="form-input" minlength="6" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="change-confirm-password" class="form-label">Confirm New Password</label>
+                        <input type="password" id="change-confirm-password" class="form-input" minlength="6" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared utility helpers (toast, date/time/currency formatting) -->
+    <script src="../shared/js/utils.js?v=1787505628"></script>
+    <script src="../shared/js/api-config.js?v=1787505628"></script>
+    <script src="../shared/js/api.js?v=1787505628"></script>
+    <!-- Role session guard -->
+    <script src="../shared/js/session.js?v=1787505628"></script>
+    <script>
+        const __session = requireRole("facultycoordinator");
+        applySessionToSidebar(__session);
+        wireLogout();
+    </script>
+    <!-- Shared state schema/seed + load/save (all 4 dashboards) -->
+    <script src="../shared/js/seed-data.js?v=1787505628"></script>
+    <script src="../shared/js/state-core.js?v=1787505628"></script>
+    <script src="../shared/js/modal.js?v=1787505628"></script>
+    <script src="../shared/js/change-password.js?v=1787505628"></script>
+    <script src="../shared/js/calendar.js?v=1787505628"></script>
+    <script src="../shared/js/budget-summary.js?v=1787505628"></script>
+    <script src="../shared/js/student-management.js?v=1787505628"></script>
+    <!-- Main coordinated JS controller — shared with president_dashboard;
+         role differences are gated at runtime on __session.role inside the file -->
+    <script src="../shared/admin/app.js?v=1787505628"></script>
+</body>
+
+</html>

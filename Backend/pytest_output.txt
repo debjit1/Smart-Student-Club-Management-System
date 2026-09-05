@@ -1,0 +1,215 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /mnt/e/SE Proj/MAY2026-Team-103/Backend/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/e/SE Proj/MAY2026-Team-103/Backend
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-4.14.2
+collecting ... collected 80 items
+
+tests/test_attendance.py::test_student_registers_and_gets_qr_token PASSED [  1%]
+tests/test_attendance.py::test_duplicate_registration_returns_409 PASSED [  2%]
+tests/test_attendance.py::test_register_unknown_event_returns_404 PASSED [  3%]
+tests/test_attendance.py::test_club_head_checks_in_registrant PASSED     [  5%]
+tests/test_attendance.py::test_volunteer_with_attendance_task_can_check_in PASSED [  6%]
+tests/test_attendance.py::test_check_in_by_unrelated_user_returns_403 PASSED [  7%]
+tests/test_attendance.py::test_double_check_in_returns_409 PASSED        [  8%]
+tests/test_attendance.py::test_check_in_unknown_token_returns_404 PASSED [ 10%]
+tests/test_attendance.py::test_event_roster_visible_to_club_head_only PASSED [ 11%]
+tests/test_attendance.py::test_list_my_registrations PASSED              [ 12%]
+tests/test_auth.py::test_register_creates_user_with_role PASSED          [ 13%]
+tests/test_auth.py::test_register_duplicate_email_returns_409 PASSED     [ 15%]
+tests/test_auth.py::test_register_invalid_role_returns_422 PASSED        [ 16%]
+tests/test_auth.py::test_login_success_returns_token PASSED              [ 17%]
+tests/test_auth.py::test_login_wrong_password_returns_401 PASSED         [ 18%]
+tests/test_auth.py::test_login_unknown_email_returns_401 PASSED          [ 20%]
+tests/test_auth.py::test_me_requires_token PASSED                        [ 21%]
+tests/test_auth.py::test_me_returns_current_user PASSED                  [ 22%]
+tests/test_certificates.py::test_finalize_issues_certificates_to_volunteer_and_attendee PASSED [ 23%]
+tests/test_certificates.py::test_finalize_twice_returns_409 PASSED       [ 25%]
+tests/test_certificates.py::test_finalize_requires_faculty_role PASSED   [ 26%]
+tests/test_certificates.py::test_finalize_unknown_event_returns_404 PASSED [ 27%]
+tests/test_certificates.py::test_budget_overview_aggregates_across_clubs PASSED [ 28%]
+tests/test_certificates.py::test_budget_overview_requires_faculty_role PASSED [ 30%]
+tests/test_clubs.py::test_create_club_requires_faculty_role PASSED       [ 31%]
+tests/test_clubs.py::test_create_club_as_faculty_succeeds PASSED         [ 32%]
+tests/test_clubs.py::test_create_club_with_custom_club_head_credentials PASSED [ 33%]
+tests/test_clubs.py::test_create_club_with_duplicate_custom_email_returns_409 PASSED [ 35%]
+tests/test_clubs.py::test_create_club_duplicate_name_returns_409 PASSED  [ 36%]
+tests/test_clubs.py::test_list_clubs_is_public PASSED                    [ 37%]
+tests/test_clubs.py::test_get_unknown_club_returns_404 PASSED            [ 38%]
+tests/test_clubs.py::test_apply_for_membership_then_duplicate_conflicts PASSED [ 40%]
+tests/test_clubs.py::test_club_head_can_approve_membership PASSED        [ 41%]
+tests/test_clubs.py::test_other_club_head_cannot_approve_membership PASSED [ 42%]
+tests/test_clubs.py::test_reviewing_already_decided_membership_returns_409 PASSED [ 43%]
+tests/test_clubs.py::test_domain_creation_and_volunteer_application_flow PASSED [ 45%]
+tests/test_clubs.py::test_delete_domain_removes_it PASSED                [ 46%]
+tests/test_clubs.py::test_delete_domain_with_active_applications_returns_409 PASSED [ 47%]
+tests/test_clubs.py::test_revoke_and_reopen_volunteer_application PASSED [ 48%]
+tests/test_clubs.py::test_volunteer_application_to_closed_domain_returns_404 PASSED [ 50%]
+tests/test_clubs.py::test_self_service_memberships_and_applications PASSED [ 51%]
+tests/test_clubs.py::test_club_president_can_list_members_and_volunteer_applications PASSED [ 52%]
+tests/test_events.py::test_create_proposal_as_draft PASSED               [ 53%]
+tests/test_events.py::test_create_proposal_wrong_club_head_returns_403 PASSED [ 55%]
+tests/test_events.py::test_full_pipeline_approves_and_creates_event_and_booking PASSED [ 56%]
+tests/test_events.py::test_submitting_non_draft_proposal_returns_409 PASSED [ 57%]
+tests/test_events.py::test_president_rejects_proposal PASSED             [ 58%]
+tests/test_events.py::test_faculty_review_blocked_by_venue_conflict PASSED [ 60%]
+tests/test_events.py::test_get_unknown_proposal_returns_404 PASSED       [ 61%]
+tests/test_events.py::test_publish_event_requires_owning_club_head PASSED [ 62%]
+tests/test_finance_bills.py::test_club_head_uploads_bill_file_and_it_persists_on_disk PASSED [ 63%]
+tests/test_finance_bills.py::test_upload_bill_amount_zero_marks_not_utilized_without_file PASSED [ 65%]
+tests/test_finance_bills.py::test_unrelated_user_cannot_upload_bill PASSED [ 66%]
+tests/test_finance_bills.py::test_volunteer_with_linked_bill_task_can_upload PASSED [ 67%]
+tests/test_finance_bills.py::test_volunteer_without_linked_task_cannot_upload PASSED [ 68%]
+tests/test_finance_bills.py::test_upload_bill_non_editable_status_returns_409 PASSED [ 70%]
+tests/test_llm.py::test_venue_suggest_requires_auth PASSED               [ 71%]
+tests/test_llm.py::test_venue_suggest_ranks_by_capacity_fit_without_api_key PASSED [ 72%]
+tests/test_llm.py::test_venue_suggest_excludes_venues_booked_on_schedule_date PASSED [ 73%]
+tests/test_llm.py::test_venue_suggest_accepts_requirements_text PASSED   [ 75%]
+tests/test_llm.py::test_notification_digest_requires_auth PASSED         [ 76%]
+tests/test_llm.py::test_notification_digest_empty_list_returns_no_new_notifications PASSED [ 77%]
+tests/test_llm.py::test_notification_digest_summarizes_without_api_key PASSED [ 78%]
+tests/test_tasks.py::test_club_head_assigns_task_to_volunteer PASSED     [ 80%]
+tests/test_tasks.py::test_assign_task_to_non_volunteer_returns_404 PASSED [ 81%]
+tests/test_tasks.py::test_assign_task_wrong_club_head_returns_403 PASSED [ 82%]
+tests/test_tasks.py::test_full_task_lifecycle_accept_submit_verify PASSED [ 83%]
+tests/test_tasks.py::test_revision_requested_can_be_resubmitted PASSED   [ 85%]
+tests/test_tasks.py::test_accept_task_not_assignee_returns_403 PASSED    [ 86%]
+tests/test_tasks.py::test_submit_proof_before_accept_returns_409 PASSED  [ 87%]
+tests/test_tasks.py::test_list_my_tasks_returns_only_assigned PASSED     [ 88%]
+tests/test_venues.py::test_create_venue_requires_faculty_role PASSED     [ 90%]
+tests/test_venues.py::test_list_venues_is_public PASSED                  [ 91%]
+tests/test_venues.py::test_venue_availability_true_when_no_booking PASSED [ 92%]
+tests/test_venues.py::test_venue_availability_unknown_venue_returns_404 PASSED [ 93%]
+tests/test_venues.py::test_create_booking_then_conflicting_booking_returns_409 PASSED [ 95%]
+tests/test_venues.py::test_booking_different_date_succeeds PASSED        [ 96%]
+tests/test_venues.py::test_release_booking_then_rebooking_same_date_succeeds PASSED [ 97%]
+tests/test_venues.py::test_inventory_checkout_reduces_available_stock PASSED [ 98%]
+tests/test_venues.py::test_inventory_checkout_over_stock_returns_409 PASSED [100%]
+
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+app/schemas.py:27
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:27: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class RoleOut(BaseModel):
+
+app/schemas.py:35
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:35: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class UserOut(BaseModel):
+
+app/schemas.py:69
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:69: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ClubOut(BaseModel):
+
+app/schemas.py:137
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:137: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ClubMemberOut(BaseModel):
+
+app/schemas.py:174
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:174: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class DomainOut(BaseModel):
+
+app/schemas.py:190
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:190: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VolunteerApplicationOut(BaseModel):
+
+app/schemas.py:235
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:235: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VenueOut(BaseModel):
+
+app/schemas.py:276
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:276: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class InventoryUsageOut(BaseModel):
+
+app/schemas.py:312
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:312: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class BookingOut(BaseModel):
+
+app/schemas.py:343
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:343: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EventProposalOut(BaseModel):
+
+app/schemas.py:368
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:368: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EventOut(BaseModel):
+
+app/schemas.py:414
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:414: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class TaskOut(BaseModel):
+
+app/schemas.py:438
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:438: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class RegistrationOut(BaseModel):
+
+app/schemas.py:452
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:452: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CertificateOut(BaseModel):
+
+app/schemas.py:544
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:544: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class FinanceTransactionOut(BaseModel):
+
+app/schemas.py:570
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:570: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EventBudgetOut(BaseModel):
+
+app/schemas.py:599
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/schemas.py:599: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ExpenseOut(BaseModel):
+
+app/main.py:58
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/main.py:58: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv/lib/python3.12/site-packages/fastapi/applications.py:4675
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/venv/lib/python3.12/site-packages/fastapi/applications.py:4675: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+tests/test_attendance.py: 52 warnings
+tests/test_auth.py: 5 warnings
+tests/test_certificates.py: 30 warnings
+tests/test_clubs.py: 46 warnings
+tests/test_events.py: 40 warnings
+tests/test_finance_bills.py: 33 warnings
+tests/test_llm.py: 7 warnings
+tests/test_tasks.py: 43 warnings
+tests/test_venues.py: 20 warnings
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/venv/lib/python3.12/site-packages/sqlalchemy/sql/schema.py:3623: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+tests/test_attendance.py::test_club_head_checks_in_registrant
+tests/test_attendance.py::test_volunteer_with_attendance_task_can_check_in
+tests/test_attendance.py::test_double_check_in_returns_409
+tests/test_certificates.py::test_finalize_issues_certificates_to_volunteer_and_attendee
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/routers/attendance.py:31: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return datetime.datetime.utcnow() + IST_OFFSET
+
+tests/test_certificates.py::test_finalize_issues_certificates_to_volunteer_and_attendee
+tests/test_tasks.py::test_full_task_lifecycle_accept_submit_verify
+tests/test_tasks.py::test_revision_requested_can_be_resubmitted
+tests/test_tasks.py::test_revision_requested_can_be_resubmitted
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/routers/tasks.py:174: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    task.submitted_at = datetime.datetime.utcnow()
+
+tests/test_certificates.py::test_finalize_issues_certificates_to_volunteer_and_attendee
+tests/test_tasks.py::test_full_task_lifecycle_accept_submit_verify
+tests/test_tasks.py::test_revision_requested_can_be_resubmitted
+  /mnt/e/SE Proj/MAY2026-Team-103/Backend/app/routers/tasks.py:206: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    task.reviewed_at = datetime.datetime.utcnow()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+====================== 80 passed, 307 warnings in 27.15s =======================

@@ -1,0 +1,368 @@
+/* ============================================================
+   Generic building blocks introduced by the Phase 4 redesign:
+   club membership grid, volunteering flow, Club Activities,
+   notifications dropdown, badges, and plain form controls.
+============================================================= */
+
+.hidden {
+    display: none !important;
+}
+
+.text-muted-note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* ---- Plain form controls (volunteer application / task proof forms) ---- */
+.form-group {
+    margin-bottom: 1.1rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 0.4rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    font-size: 0.9rem;
+    color: var(--text-main);
+    background-color: var(--bg-card);
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 70px;
+}
+
+/* ---- Badges ---- */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 100px;
+    white-space: nowrap;
+}
+
+.badge-secondary { background-color: #f1f5f9; color: #475569; }
+.badge-info { background-color: var(--info-light); color: var(--info); }
+.badge-warning { background-color: var(--warning-light); color: var(--warning); }
+.badge-success { background-color: var(--success-light); color: var(--success); }
+.badge-danger { background-color: var(--danger-light); color: var(--danger); }
+
+/* ---- Notification bell dropdown ---- */
+.notif-wrap {
+    position: relative;
+}
+
+.notif-dropdown {
+    position: absolute;
+    top: calc(100% + 0.6rem);
+    right: 0;
+    width: 340px;
+    max-height: 420px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-premium);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 500;
+}
+
+.notif-dropdown-header {
+    padding: 0.85rem 1.1rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.notif-dropdown-list {
+    overflow-y: auto;
+    max-height: 360px;
+}
+
+.notif-item {
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.82rem;
+    color: var(--text-main);
+    line-height: 1.4;
+}
+
+.notif-item:last-child {
+    border-bottom: none;
+}
+
+.notif-item.unread {
+    background-color: var(--primary-light);
+}
+
+.notif-item-time {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.notif-empty {
+    padding: 1.75rem 1.1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.notif-digest {
+    padding: 0.7rem 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--primary-light);
+}
+
+.notif-digest-summary {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0 0 0.3rem;
+}
+
+.notif-digest-highlights {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+}
+
+.notif-digest-highlights li {
+    margin-bottom: 0.15rem;
+}
+
+/* ---- Clubs grid (cards) ---- */
+.clubs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.club-card {
+    background-color: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.club-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3.5px;
+    background: var(--grad-primary);
+}
+
+.club-card:nth-child(2n)::before { background: var(--grad-emerald); }
+.club-card:nth-child(3n)::before { background: var(--grad-amber); }
+.club-card:nth-child(4n)::before { background: var(--grad-rose); }
+.club-card:nth-child(5n)::before { background: var(--grad-cyan); }
+
+.club-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(2, 132, 199, 0.3);
+}
+
+.club-card-top {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.club-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--border-radius-md);
+    background-color: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.club-card-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.club-card-category {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.club-card-desc {
+    font-size: 0.83rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.club-card-status-row {
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* ---- Club modal membership panel ---- */
+.membership-status-box {
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+/* ---- Club Activities tab ---- */
+.ca-club-block {
+    margin-bottom: 2rem;
+}
+
+.ca-club-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.ca-club-header h2 {
+    font-size: 1.3rem;
+}
+
+.ca-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 1.25rem 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-main);
+}
+
+.ca-domain-group {
+    margin-bottom: 1.25rem;
+}
+
+.ca-domain-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.6rem;
+}
+
+.task-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.task-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 1.1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.task-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.4rem;
+}
+
+.task-card-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.task-card-meta {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 0.6rem;
+}
+
+.task-card-proof {
+    font-size: 0.78rem;
+    color: var(--text-main);
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.6rem;
+}
+
+.task-card-actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.mini-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.mini-table th, .mini-table td {
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.mini-table th {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+    .notif-dropdown {
+        width: 280px;
+        right: -60px;
+    }
+}
